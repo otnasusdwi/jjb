@@ -13,13 +13,13 @@ class TravelPackageController extends Controller
 {
     public function index()
     {
-        $packages = TravelPackage::with(['category', 'tags'])
+        $packages = TravelPackage::with('tags')
             ->when(request('search'), function ($query) {
                 $query->where('name', 'like', '%' . request('search') . '%')
                     ->orWhere('location', 'like', '%' . request('search') . '%');
             })
             ->when(request('category'), function ($query) {
-                $query->where('category_id', request('category'));
+                $query->where('category', request('category'));
             })
             ->when(request('status'), function ($query) {
                 $query->where('status', request('status'));
@@ -43,72 +43,111 @@ class TravelPackageController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'category_id' => 'required|exists:package_categories,id',
-            'duration_days' => 'required|integer|min:1',
-            'duration_nights' => 'required|integer|min:0',
-            'difficulty_level' => 'required|in:easy,moderate,challenging,difficult',
-            'min_participants' => 'required|integer|min:1',
-            'max_participants' => 'required|integer|min:1',
-            'adult_price' => 'required|numeric|min:0',
-            'child_price' => 'nullable|numeric|min:0',
-            'infant_price' => 'nullable|numeric|min:0',
-            'commission_rate' => 'required|numeric|min:0|max:100',
-            'short_description' => 'required|string|max:500',
+            'category' => 'nullable|string|max:100',
             'description' => 'required|string',
-            'highlights' => 'nullable|array',
-            'includes' => 'nullable|array',
-            'excludes' => 'nullable|array',
-            'terms_conditions' => 'nullable|string',
-            'departure_city' => 'required|string|max:255',
-            'meeting_point' => 'required|string',
             'location' => 'required|string|max:255',
-            'main_image' => 'required|image|mimes:jpeg,png,jpg|max:5120',
-            'gallery.*' => 'nullable|image|mimes:jpeg,png,jpg|max:3072',
-            'status' => 'required|in:draft,active,inactive,archived',
+            'duration' => 'required|integer|min:1|max:30',
+            'max_participants' => 'nullable|integer|min:1|max:100',
+            'difficulty_level' => 'nullable|in:easy,moderate,challenging',
+            'currency' => 'required|in:IDR,USD',
+            'price' => 'required|numeric|min:0',
+            'child_price' => 'nullable|numeric|min:0',
+            'featured_image' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
+            'gallery_images.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'itinerary' => 'nullable|array',
+            'inclusions' => 'nullable|array',
+            'inclusions.*' => 'string|max:255',
+            'exclusions' => 'nullable|array',
+            'exclusions.*' => 'string|max:255',
+            'status' => 'required|in:draft,active,inactive',
             'tags' => 'nullable|array',
-            'tags.*' => 'exists:tags,id'
+            'tags.*' => 'exists:tags,id',
+            'meta_title' => 'nullable|string|max:60',
+            'meta_description' => 'nullable|string|max:160',
+            'keywords' => 'nullable|string|max:255',
         ]);
 
         $package = new TravelPackage();
         $package->name = $request->name;
         $package->slug = Str::slug($request->name);
-        $package->category_id = $request->category_id;
-        $package->duration_days = $request->duration_days;
-        $package->duration_nights = $request->duration_nights;
-        $package->difficulty_level = $request->difficulty_level;
-        $package->min_participants = $request->min_participants;
-        $package->max_participants = $request->max_participants;
-        $package->adult_price = $request->adult_price;
-        $package->child_price = $request->child_price;
-        $package->infant_price = $request->infant_price;
-        $package->commission_rate = $request->commission_rate;
-        $package->short_description = $request->short_description;
+        $package->category = $request->category;
         $package->description = $request->description;
-        $package->highlights = $request->highlights ? json_encode($request->highlights) : null;
-        $package->includes = $request->includes ? json_encode($request->includes) : null;
-        $package->excludes = $request->excludes ? json_encode($request->excludes) : null;
-        $package->terms_conditions = $request->terms_conditions;
-        $package->departure_city = $request->departure_city;
-        $package->meeting_point = $request->meeting_point;
         $package->location = $request->location;
+        $package->duration = $request->duration;
+        $package->max_participants = $request->max_participants;
+        $package->difficulty_level = $request->difficulty_level;
+        $package->currency = $request->currency;
+        $package->price = $request->price;
+        $package->child_price = $request->child_price;
         $package->status = $request->status;
+        
+        // Handle SEO fields
+        $package->meta_title = $request->meta_title;
+        $package->meta_description = $request->meta_description;
+        $package->keywords = $request->keywords;
 
-        // Handle main image upload
-        if ($request->hasFile('main_image')) {
-            $imagePath = $request->file('main_image')->store('packages', 'public');
-            $package->main_image = $imagePath;
+        // Handle featured image upload
+        if ($request->hasFile('featured_image')) {
+            $imagePath = $request->file('featured_image')->store('packages', 'public');
+            $package->featured_image = $imagePath;
         }
 
         // Handle gallery images
-        if ($request->hasFile('gallery')) {
+        if ($request->hasFile('gallery_images')) {
             $galleryImages = [];
-            foreach ($request->file('gallery') as $file) {
-                $galleryImages[] = $file->store('packages/gallery', 'public');
+            foreach ($request->file('gallery_images') as $file) {
+                if ($file && $file->isValid()) {
+                    $galleryImages[] = $file->store('packages/gallery', 'public');
+                }
             }
-            $package->gallery = json_encode($galleryImages);
+            $package->gallery_images = !empty($galleryImages) ? json_encode($galleryImages) : null;
         }
 
         $package->save();
+
+        // Handle itinerary - save to package_itineraries table
+        if ($request->has('itinerary') && is_array($request->itinerary)) {
+            foreach ($request->itinerary as $dayNumber => $items) {
+                if (is_array($items)) {
+                    foreach ($items as $order => $item) {
+                        if (!empty($item['title'])) {
+                            $package->itineraries()->create([
+                                'day_number' => $dayNumber,
+                                'title' => $item['title'],
+                                'description' => $item['description'] ?? '',
+                                'order' => $order,
+                            ]);
+                        }
+                    }
+                }
+            }
+        }
+        
+        // Handle inclusions - save to package_inclusions table
+        if ($request->has('inclusions') && is_array($request->inclusions)) {
+            $order = 0;
+            foreach ($request->inclusions as $description) {
+                if (!empty(trim($description))) {
+                    $package->inclusions()->create([
+                        'description' => trim($description),
+                        'order' => $order++,
+                    ]);
+                }
+            }
+        }
+        
+        // Handle exclusions - save to package_exclusions table
+        if ($request->has('exclusions') && is_array($request->exclusions)) {
+            $order = 0;
+            foreach ($request->exclusions as $description) {
+                if (!empty(trim($description))) {
+                    $package->exclusions()->create([
+                        'description' => trim($description),
+                        'order' => $order++,
+                    ]);
+                }
+            }
+        }
 
         // Sync tags
         if ($request->has('tags')) {
@@ -121,7 +160,7 @@ class TravelPackageController extends Controller
 
     public function show(TravelPackage $package)
     {
-        $package->load(['category', 'bookings.user', 'tags']);
+        $package->load(['bookings.user', 'tags']);
         return view('admin.packages.show', compact('package'));
     }
 
@@ -129,7 +168,7 @@ class TravelPackageController extends Controller
     {
         $categories = PackageCategory::orderBy('name')->get();
         $tags = \App\Models\Tag::active()->ordered()->get()->groupBy('type');
-        $package->load('tags');
+        $package->load(['tags', 'itineraries', 'inclusions', 'exclusions']);
         return view('admin.packages.edit', compact('package', 'categories', 'tags'));
     }
 
@@ -137,82 +176,128 @@ class TravelPackageController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'category_id' => 'required|exists:package_categories,id',
-            'duration_days' => 'required|integer|min:1',
-            'duration_nights' => 'required|integer|min:0',
-            'difficulty_level' => 'required|in:easy,moderate,challenging,difficult',
-            'min_participants' => 'required|integer|min:1',
-            'max_participants' => 'required|integer|min:1',
-            'adult_price' => 'required|numeric|min:0',
-            'child_price' => 'nullable|numeric|min:0',
-            'infant_price' => 'nullable|numeric|min:0',
-            'commission_rate' => 'required|numeric|min:0|max:100',
-            'short_description' => 'required|string|max:500',
+            'category' => 'nullable|string|max:100',
             'description' => 'required|string',
-            'highlights' => 'nullable|array',
-            'includes' => 'nullable|array',
-            'excludes' => 'nullable|array',
-            'terms_conditions' => 'nullable|string',
-            'departure_city' => 'required|string|max:255',
-            'meeting_point' => 'required|string',
             'location' => 'required|string|max:255',
-            'main_image' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
-            'gallery.*' => 'nullable|image|mimes:jpeg,png,jpg|max:3072',
-            'status' => 'required|in:draft,active,inactive,archived',
+            'duration' => 'required|integer|min:1|max:30',
+            'max_participants' => 'nullable|integer|min:1|max:100',
+            'difficulty_level' => 'nullable|in:easy,moderate,challenging',
+            'currency' => 'required|in:IDR,USD',
+            'price' => 'required|numeric|min:0',
+            'child_price' => 'nullable|numeric|min:0',
+            'featured_image' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
+            'gallery_images.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'itinerary' => 'nullable|array',
+            'inclusions' => 'nullable|array',
+            'inclusions.*' => 'string|max:255',
+            'exclusions' => 'nullable|array',
+            'exclusions.*' => 'string|max:255',
+            'status' => 'required|in:draft,active,inactive',
             'tags' => 'nullable|array',
-            'tags.*' => 'exists:tags,id'
+            'tags.*' => 'exists:tags,id',
+            'meta_title' => 'nullable|string|max:60',
+            'meta_description' => 'nullable|string|max:160',
+            'keywords' => 'nullable|string|max:255',
         ]);
 
         $package->name = $request->name;
         $package->slug = Str::slug($request->name);
-        $package->category_id = $request->category_id;
-        $package->duration_days = $request->duration_days;
-        $package->duration_nights = $request->duration_nights;
-        $package->difficulty_level = $request->difficulty_level;
-        $package->min_participants = $request->min_participants;
-        $package->max_participants = $request->max_participants;
-        $package->adult_price = $request->adult_price;
-        $package->child_price = $request->child_price;
-        $package->infant_price = $request->infant_price;
-        $package->commission_rate = $request->commission_rate;
-        $package->short_description = $request->short_description;
+        $package->category = $request->category;
         $package->description = $request->description;
-        $package->highlights = $request->highlights ? json_encode($request->highlights) : null;
-        $package->includes = $request->includes ? json_encode($request->includes) : null;
-        $package->excludes = $request->excludes ? json_encode($request->excludes) : null;
-        $package->terms_conditions = $request->terms_conditions;
-        $package->departure_city = $request->departure_city;
-        $package->meeting_point = $request->meeting_point;
         $package->location = $request->location;
+        $package->duration = $request->duration;
+        $package->max_participants = $request->max_participants;
+        $package->difficulty_level = $request->difficulty_level;
+        $package->currency = $request->currency;
+        $package->price = $request->price;
+        $package->child_price = $request->child_price;
         $package->status = $request->status;
+        
+        // Handle SEO fields
+        $package->meta_title = $request->meta_title;
+        $package->meta_description = $request->meta_description;
+        $package->keywords = $request->keywords;
 
-        // Handle main image upload
-        if ($request->hasFile('main_image')) {
+        // Handle featured image upload
+        if ($request->hasFile('featured_image')) {
             // Delete old image
-            if ($package->main_image) {
-                Storage::disk('public')->delete($package->main_image);
+            if ($package->featured_image) {
+                Storage::disk('public')->delete($package->featured_image);
             }
-            $imagePath = $request->file('main_image')->store('packages', 'public');
-            $package->main_image = $imagePath;
+            $imagePath = $request->file('featured_image')->store('packages', 'public');
+            $package->featured_image = $imagePath;
         }
 
         // Handle gallery images
-        if ($request->hasFile('gallery')) {
+        if ($request->hasFile('gallery_images')) {
             // Delete old gallery images
-            if ($package->gallery) {
-                $oldGallery = json_decode($package->gallery, true);
-                foreach ($oldGallery as $oldImage) {
-                    Storage::disk('public')->delete($oldImage);
+            if ($package->gallery_images) {
+                $oldGallery = json_decode($package->gallery_images, true);
+                if (is_array($oldGallery)) {
+                    foreach ($oldGallery as $oldImage) {
+                        Storage::disk('public')->delete($oldImage);
+                    }
                 }
             }
             $galleryImages = [];
-            foreach ($request->file('gallery') as $file) {
-                $galleryImages[] = $file->store('packages/gallery', 'public');
+            foreach ($request->file('gallery_images') as $file) {
+                if ($file && $file->isValid()) {
+                    $galleryImages[] = $file->store('packages/gallery', 'public');
+                }
             }
-            $package->gallery = json_encode($galleryImages);
+            $package->gallery_images = !empty($galleryImages) ? json_encode($galleryImages) : null;
         }
 
         $package->save();
+
+        // Delete existing itineraries, inclusions, exclusions
+        $package->itineraries()->delete();
+        $package->inclusions()->delete();
+        $package->exclusions()->delete();
+
+        // Handle itinerary - save to package_itineraries table
+        if ($request->has('itinerary') && is_array($request->itinerary)) {
+            foreach ($request->itinerary as $dayNumber => $items) {
+                if (is_array($items)) {
+                    foreach ($items as $order => $item) {
+                        if (!empty($item['title'])) {
+                            $package->itineraries()->create([
+                                'day_number' => $dayNumber,
+                                'title' => $item['title'],
+                                'description' => $item['description'] ?? '',
+                                'order' => $order,
+                            ]);
+                        }
+                    }
+                }
+            }
+        }
+        
+        // Handle inclusions - save to package_inclusions table
+        if ($request->has('inclusions') && is_array($request->inclusions)) {
+            $order = 0;
+            foreach ($request->inclusions as $description) {
+                if (!empty(trim($description))) {
+                    $package->inclusions()->create([
+                        'description' => trim($description),
+                        'order' => $order++,
+                    ]);
+                }
+            }
+        }
+        
+        // Handle exclusions - save to package_exclusions table
+        if ($request->has('exclusions') && is_array($request->exclusions)) {
+            $order = 0;
+            foreach ($request->exclusions as $description) {
+                if (!empty(trim($description))) {
+                    $package->exclusions()->create([
+                        'description' => trim($description),
+                        'order' => $order++,
+                    ]);
+                }
+            }
+        }
 
         // Sync tags
         if ($request->has('tags')) {
@@ -232,13 +317,15 @@ class TravelPackageController extends Controller
         }
 
         // Delete images
-        if ($package->main_image) {
-            Storage::disk('public')->delete($package->main_image);
+        if ($package->featured_image) {
+            Storage::disk('public')->delete($package->featured_image);
         }
-        if ($package->gallery) {
-            $galleryImages = json_decode($package->gallery, true);
-            foreach ($galleryImages as $image) {
-                Storage::disk('public')->delete($image);
+        if ($package->gallery_images) {
+            $galleryImages = json_decode($package->gallery_images, true);
+            if (is_array($galleryImages)) {
+                foreach ($galleryImages as $image) {
+                    Storage::disk('public')->delete($image);
+                }
             }
         }
 

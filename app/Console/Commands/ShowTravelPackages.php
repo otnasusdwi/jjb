@@ -14,7 +14,7 @@ class ShowTravelPackages extends Command
     {
         $packages = TravelPackage::with('category')->get();
 
-        $this->info('Travel Packages:');
+        $this->info('Packages:');
         $this->line('');
 
         foreach ($packages as $package) {

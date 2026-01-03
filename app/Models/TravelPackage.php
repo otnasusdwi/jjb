@@ -14,50 +14,29 @@ class TravelPackage extends Model
     use HasFactory;
 
     protected $fillable = [
-        'category_id',
         'name',
         'slug',
-        'short_description',
-        'full_description',
-        'highlights',
-        'includes',
-        'excludes',
-        'terms_conditions',
-        'duration_days',
-        'duration_nights',
-        'price_adult',
-        'price_child',
-        'price_infant',
-        'min_participants',
+        'category',
+        'description',
+        'location',
+        'duration',
         'max_participants',
         'difficulty_level',
-        'departure_city',
-        'meeting_point',
-        'transportation_details',
-        'accommodation_details',
-        'main_image_path',
+        'currency',
+        'price',
+        'child_price',
+        'featured_image',
         'gallery_images',
-        'video_url',
-        'virtual_tour_url',
-        'commission_rate',
-        'is_featured',
         'status',
-        'seo_title',
-        'seo_description',
+        'meta_title',
+        'meta_description',
         'keywords',
-        'created_by',
     ];
 
     protected $casts = [
-        'highlights' => 'array',
-        'includes' => 'array',
-        'excludes' => 'array',
         'gallery_images' => 'array',
-        'price_adult' => 'decimal:2',
-        'price_child' => 'decimal:2',
-        'price_infant' => 'decimal:2',
-        'commission_rate' => 'decimal:2',
-        'is_featured' => 'boolean',
+        'price' => 'decimal:2',
+        'child_price' => 'decimal:2',
     ];
 
     /**
@@ -81,27 +60,39 @@ class TravelPackage extends Model
     }
 
     /**
-     * Get the category for this package
-     */
-    public function category(): BelongsTo
-    {
-        return $this->belongsTo(PackageCategory::class, 'category_id');
-    }
-
-    /**
-     * Get the user who created this package
-     */
-    public function creator(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'created_by');
-    }
-
-    /**
      * Get bookings for this package
      */
     public function bookings(): HasMany
     {
         return $this->hasMany(Booking::class, 'package_id');
+    }
+
+    /**
+     * Get itineraries for this package
+     */
+    public function itineraries(): HasMany
+    {
+        return $this->hasMany(PackageItinerary::class, 'travel_package_id')
+            ->orderBy('day_number')
+            ->orderBy('order');
+    }
+
+    /**
+     * Get inclusions for this package
+     */
+    public function inclusions(): HasMany
+    {
+        return $this->hasMany(PackageInclusion::class, 'travel_package_id')
+            ->orderBy('order');
+    }
+
+    /**
+     * Get exclusions for this package
+     */
+    public function exclusions(): HasMany
+    {
+        return $this->hasMany(PackageExclusion::class, 'travel_package_id')
+            ->orderBy('order');
     }
 
     /**
@@ -122,27 +113,27 @@ class TravelPackage extends Model
     }
 
     /**
-     * Get formatted price for adults
+     * Get formatted price
      */
-    public function getFormattedPriceAdultAttribute(): string
+    public function getFormattedPriceAttribute(): string
     {
-        return 'IDR ' . number_format($this->price_adult, 0, ',', '.');
+        if ($this->currency === 'USD') {
+            return '$' . number_format($this->price, 2, '.', ',');
+        }
+        return 'IDR ' . number_format($this->price, 0, ',', '.');
     }
 
     /**
-     * Get formatted price for children
+     * Get formatted child price
      */
-    public function getFormattedPriceChildAttribute(): string
+    public function getFormattedChildPriceAttribute(): string
     {
-        return $this->price_child ? 'IDR ' . number_format($this->price_child, 0, ',', '.') : 'N/A';
-    }
-
-    /**
-     * Get formatted price for infants
-     */
-    public function getFormattedPriceInfantAttribute(): string
-    {
-        return $this->price_infant ? 'IDR ' . number_format($this->price_infant, 0, ',', '.') : 'N/A';
+        if (!$this->child_price) return 'N/A';
+        
+        if ($this->currency === 'USD') {
+            return '$' . number_format($this->child_price, 2, '.', ',');
+        }
+        return 'IDR ' . number_format($this->child_price, 0, ',', '.');
     }
 
     /**
@@ -150,36 +141,27 @@ class TravelPackage extends Model
      */
     public function getDurationStringAttribute(): string
     {
-        return "{$this->duration_days} Days {$this->duration_nights} Nights";
+        return "{$this->duration} Days";
     }
 
     /**
-     * Get main image URL
+     * Get featured image URL
      */
-    public function getMainImageUrlAttribute(): string
+    public function getFeaturedImageUrlAttribute(): string
     {
-        return $this->main_image_path ? asset('storage/' . $this->main_image_path) : asset('images/package-placeholder.jpg');
+        return $this->featured_image ? asset('storage/' . $this->featured_image) : asset('images/package-placeholder.jpg');
     }
 
     /**
      * Calculate total price for booking
      */
-    public function calculateTotalPrice(int $adults = 0, int $children = 0, int $infants = 0): float
+    public function calculateTotalPrice(int $adults = 0, int $children = 0): float
     {
         $total = 0;
-        $total += $adults * $this->price_adult;
-        $total += $children * ($this->price_child ?? 0);
-        $total += $infants * ($this->price_infant ?? 0);
+        $total += $adults * $this->price;
+        $total += $children * ($this->child_price ?? $this->price);
 
         return $total;
-    }
-
-    /**
-     * Calculate commission amount
-     */
-    public function calculateCommission(float $totalPrice): float
-    {
-        return $totalPrice * ($this->commission_rate / 100);
     }
 
     /**
@@ -191,21 +173,13 @@ class TravelPackage extends Model
     }
 
     /**
-     * Scope for featured packages
-     */
-    public function scopeFeatured($query)
-    {
-        return $query->where('is_featured', true);
-    }
-
-    /**
      * Scope for searching packages
      */
     public function scopeSearch($query, $search)
     {
         return $query->where(function ($q) use ($search) {
             $q->where('name', 'LIKE', "%{$search}%")
-              ->orWhere('short_description', 'LIKE', "%{$search}%")
+              ->orWhere('description', 'LIKE', "%{$search}%")
               ->orWhere('keywords', 'LIKE', "%{$search}%");
         });
     }
@@ -216,11 +190,11 @@ class TravelPackage extends Model
     public function scopePriceRange($query, $minPrice = null, $maxPrice = null)
     {
         if ($minPrice) {
-            $query->where('price_adult', '>=', $minPrice);
+            $query->where('price', '>=', $minPrice);
         }
 
         if ($maxPrice) {
-            $query->where('price_adult', '<=', $maxPrice);
+            $query->where('price', '<=', $maxPrice);
         }
 
         return $query;

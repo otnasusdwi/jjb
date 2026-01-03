@@ -331,7 +331,7 @@ Added to `resources/views/layouts/admin.blade.php`:
 </li>
 ```
 
-Located after "Travel Packages" menu item.
+Located after "Packages" menu item.
 
 ---
 

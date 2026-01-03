@@ -57,7 +57,7 @@ Route::prefix('admin')->middleware(['auth', 'role:admin,super_admin'])->name('ad
         Route::post('/{affiliate}/message', [AdminAffiliateController::class, 'sendMessage'])->name('message');
     });
 
-    // Travel Packages
+    // Packages
     Route::prefix('packages')->name('packages.')->group(function () {
         Route::get('/', [TravelPackageController::class, 'index'])->name('index');
         Route::get('/create', [TravelPackageController::class, 'create'])->name('create');

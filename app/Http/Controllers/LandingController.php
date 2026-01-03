@@ -11,9 +11,8 @@ class LandingController extends Controller
     public function index()
     {
         // Get all active packages with tags for filtering
-        $packages = TravelPackage::with(['category', 'tags'])
+        $packages = TravelPackage::with('tags')
             ->where('status', 'active')
-            ->orderBy('is_featured', 'desc')
             ->orderBy('created_at', 'desc')
             ->get();
 

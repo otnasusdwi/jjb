@@ -60,7 +60,7 @@
 - created_at, updated_at
 ```
 
-#### Travel Packages
+#### Packages
 ```sql
 - id, category_id (FK), name, slug
 - short_description, full_description

@@ -25,7 +25,7 @@ graph TD
 graph TD
     A[👤 Affiliate Login] --> B[📊 Dashboard]
     B --> C[➕ Klik 'Tambah Booking']
-    C --> D[📦 Pilih Travel Package]
+    C --> D[📦 Pilih Package]
     D --> E[👤 Input Data Customer]
     E --> F[📅 Set Travel Date & Peserta]
     F --> G[👥 Input Detail Peserta]

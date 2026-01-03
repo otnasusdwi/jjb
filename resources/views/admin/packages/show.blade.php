@@ -297,10 +297,6 @@
                 </div>
                 <div class="card-body">
                     <div class="d-flex align-items-center mb-2">
-                        <i class="ri-star-fill {{ $package->is_featured ? 'text-warning' : 'text-muted' }} me-2"></i>
-                        <span>Featured Package</span>
-                    </div>
-                    <div class="d-flex align-items-center mb-2">
                         <i class="ri-fire-fill {{ $package->is_popular ? 'text-danger' : 'text-muted' }} me-2"></i>
                         <span>Popular Package</span>
                     </div>

@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Add New Travel Package')
+@section('title', 'Add New Package')
 
 @section('content')
 <div class="container-fluid">
@@ -8,7 +8,7 @@
     <div class="page-title-box mb-4">
         <div class="row align-items-center">
             <div class="col-md-8">
-                <h4 class="page-title mb-1">Add New Travel Package</h4>
+                <h4 class="page-title mb-1">Add New Package</h4>
                 <ol class="breadcrumb m-0">
                     <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
                     <li class="breadcrumb-item"><a href="{{ route('admin.packages.index') }}">Packages</a></li>
@@ -62,7 +62,7 @@
             <!-- Basic Info & Pricing Tab -->
             <div class="tab-pane fade show active" id="basic" role="tabpanel">
                 <div class="row">
-                    <div class="col-lg-8">
+                    <div class="col-lg-12">
                         <div class="card mb-3">
                             <div class="card-header">
                                 <h5 class="card-title mb-0">Basic Information</h5>
@@ -203,46 +203,6 @@
                             </div>
                         </div>
                     </div>
-
-                    <div class="col-lg-4">
-                        <!-- Settings -->
-                        <div class="card mb-3">
-                            <div class="card-header">
-                                <h5 class="card-title mb-0">Settings</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="mb-3">
-                                    <label for="status" class="form-label">Status</label>
-                                    <select class="form-select @error('status') is-invalid @enderror" id="status" name="status">
-                                        <option value="draft" {{ old('status', 'draft') === 'draft' ? 'selected' : '' }}>Draft</option>
-                                        <option value="active" {{ old('status') === 'active' ? 'selected' : '' }}>Active</option>
-                                        <option value="inactive" {{ old('status') === 'inactive' ? 'selected' : '' }}>Inactive</option>
-                                    </select>
-                                    @error('status')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-
-                                <div class="form-check mb-2">
-                                    <input class="form-check-input" type="checkbox" id="is_featured" name="is_featured" value="1"
-                                           {{ old('is_featured') ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="is_featured">Featured Package</label>
-                                </div>
-
-                                <div class="form-check mb-2">
-                                    <input class="form-check-input" type="checkbox" id="is_popular" name="is_popular" value="1"
-                                           {{ old('is_popular') ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="is_popular">Popular Package</label>
-                                </div>
-
-                                <div class="form-check mb-0">
-                                    <input class="form-check-input" type="checkbox" id="instant_booking" name="instant_booking" value="1"
-                                           {{ old('instant_booking') ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="instant_booking">Allow Instant Booking</label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
 
@@ -341,7 +301,7 @@
             <div class="tab-pane fade" id="settings" role="tabpanel">
                 <div class="row">
                     <div class="col-lg-4">
-                        <div class="card">
+                        <div class="card mb-3">
                             <div class="card-header">
                                 <h5 class="card-title mb-0"><i class="ri-price-tag-3-line"></i> Tags</h5>
                             </div>
@@ -362,6 +322,25 @@
                                     @endif
                                 </select>
                                 <div class="form-text">Select multiple tags</div>
+                            </div>
+                        </div>
+                        <!-- Settings -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Settings</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label for="status" class="form-label">Status</label>
+                                    <select class="form-select @error('status') is-invalid @enderror" id="status" name="status">
+                                        <option value="draft" {{ old('status', 'draft') === 'draft' ? 'selected' : '' }}>Draft</option>
+                                        <option value="active" {{ old('status') === 'active' ? 'selected' : '' }}>Active</option>
+                                        <option value="inactive" {{ old('status') === 'inactive' ? 'selected' : '' }}>Inactive</option>
+                                    </select>
+                                    @error('status')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -549,30 +528,76 @@ function previewGalleryImage(event, imageId) {
 // Add itinerary day
 let dayCounter = 0;
 function addItineraryDay() {
-    dayCounter++;
     const container = document.getElementById('itinerary-container');
+    // Recalculate day number based on existing days
+    const existingDays = container.querySelectorAll('.border.rounded.p-3.mb-3');
+    dayCounter = existingDays.length + 1;
     const dayHtml = `
         <div class="border rounded p-3 mb-3" id="day-${dayCounter}">
             <div class="d-flex justify-content-between align-items-center mb-2">
                 <h6 class="mb-0">Day ${dayCounter}</h6>
-                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeDay(${dayCounter})">
+                <div>
+                    <button type="button" class="btn btn-sm btn-outline-primary me-1" onclick="addDayItem(${dayCounter})">
+                        <i class="ri-add-line"></i> Add Item
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeDay(${dayCounter})">
+                        <i class="ri-delete-bin-line"></i>
+                    </button>
+                </div>
+            </div>
+            <div id="day-${dayCounter}-items">
+                <div class="item-group mb-2" id="day-${dayCounter}-item-0">
+                    <div class="mb-2">
+                        <input type="text" class="form-control form-control-sm"
+                               name="itinerary[${dayCounter}][0][title]"
+                               placeholder="Activity title">
+                    </div>
+                    <div>
+                        <textarea class="form-control form-control-sm"
+                                  name="itinerary[${dayCounter}][0][description]"
+                                  rows="2"
+                                  placeholder="Activity description"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    container.insertAdjacentHTML('beforeend', dayHtml);
+}
+
+// Add item to a specific day
+function addDayItem(dayId) {
+    const itemsContainer = document.getElementById(`day-${dayId}-items`);
+    const currentItems = itemsContainer.querySelectorAll('.item-group');
+    const newItemIndex = currentItems.length;
+    
+    const itemHtml = `
+        <div class="item-group mb-2" id="day-${dayId}-item-${newItemIndex}">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+                <small class="text-muted">Item ${newItemIndex + 1}</small>
+                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeDayItem(${dayId}, ${newItemIndex})">
                     <i class="ri-delete-bin-line"></i>
                 </button>
             </div>
             <div class="mb-2">
                 <input type="text" class="form-control form-control-sm"
-                       name="itinerary[${dayCounter}][title]"
-                       placeholder="Day ${dayCounter} title">
+                       name="itinerary[${dayId}][${newItemIndex}][title]"
+                       placeholder="Activity title">
             </div>
             <div>
                 <textarea class="form-control form-control-sm"
-                          name="itinerary[${dayCounter}][description]"
-                          rows="3"
-                          placeholder="Day ${dayCounter} activities and description"></textarea>
+                          name="itinerary[${dayId}][${newItemIndex}][description]"
+                          rows="2"
+                          placeholder="Activity description"></textarea>
             </div>
         </div>
     `;
-    container.insertAdjacentHTML('beforeend', dayHtml);
+    itemsContainer.insertAdjacentHTML('beforeend', itemHtml);
+}
+
+// Remove a specific item from a day
+function removeDayItem(dayId, itemIndex) {
+    document.getElementById(`day-${dayId}-item-${itemIndex}`).remove();
 }
 
 // Remove itinerary day
@@ -626,9 +651,10 @@ function removeExclusion(id) {
 
 // Initialize with first items
 document.addEventListener('DOMContentLoaded', function() {
-    addItineraryDay();
-    addInclusion();
-    addExclusion();
+    // Don't auto-add items, let user add them manually
+    // addItineraryDay();
+    // addInclusion();
+    // addExclusion();
 });
 
 // Save as draft

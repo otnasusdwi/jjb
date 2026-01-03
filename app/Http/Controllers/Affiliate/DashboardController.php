@@ -45,7 +45,6 @@ class DashboardController extends Controller
 
         // Available packages
         $featured_packages = TravelPackage::where('status', 'active')
-            ->where('is_featured', true)
             ->limit(6)
             ->get();
 

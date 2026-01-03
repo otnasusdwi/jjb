@@ -312,7 +312,7 @@ JJB Travel Bali adalah platform afiliasi travel yang memungkinkan Anda untuk men
 
 ---
 
-### 4. 🎯 Mengelola Travel Packages
+### 4. 🎯 Mengelola Packages
 
 #### A. Package Categories
 **Kategori Default:**
@@ -335,7 +335,7 @@ JJB Travel Bali adalah platform afiliasi travel yang memungkinkan Anda untuk men
 - 🖼️ **Upload Image**: Gambar representative kategori
 - 🔄 **Reorder**: Atur urutan tampilan
 
-#### B. Travel Packages CRUD
+#### B. Packages CRUD
 
 ##### Create New Package:
 **Basic Information:**

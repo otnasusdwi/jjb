@@ -1,12 +1,12 @@
 @extends('layouts.admin')
 
-@section('title', 'Travel Packages')
+@section('title', 'Packages')
 
 @section('content')
 <div class="page-title-box mb-4">
     <div class="row align-items-center">
         <div class="col-md-8">
-            <h4 class="page-title mb-1">Travel Packages</h4>
+            <h4 class="page-title mb-1">Packages</h4>
             <ol class="breadcrumb m-0">
                 <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
                 <li class="breadcrumb-item active">Packages</li>
@@ -102,11 +102,11 @@
                                         </div>
                                     </td>
                                     <td>
-                                        @if($package->category)
+                                        {{-- @if($package->category)
                                             <span class="badge bg-info">{{ $package->category->name }}</span>
                                         @else
                                             <span class="text-muted">No Category</span>
-                                        @endif
+                                        @endif --}}
                                     </td>
                                     <td>
                                         {{ $package->duration_days }}D {{ $package->duration_nights }}N

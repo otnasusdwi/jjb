@@ -123,7 +123,7 @@
                         <a class="nav-link {{ request()->routeIs('admin.packages.*') ? 'active' : '' }}"
                            href="{{ route('admin.packages.index') }}">
                             <i class="ri-gift-line me-2"></i>
-                            Travel Packages
+                            Packages
                         </a>
                     </li>
                     <li class="nav-item">

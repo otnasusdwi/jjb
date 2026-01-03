@@ -12,12 +12,12 @@
                 <ol class="breadcrumb m-0">
                     <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
                     <li class="breadcrumb-item"><a href="{{ route('admin.packages.index') }}">Packages</a></li>
-                    <li class="breadcrumb-item active">Edit - {{ Str::limit($package->name, 30) }}</li>
+                    <li class="breadcrumb-item active">Edit</li>
                 </ol>
             </div>
             <div class="col-md-4">
                 <div class="float-end">
-                    <a href="{{ route('admin.packages.show', $package) }}" class="btn btn-outline-secondary">
+                    <a href="{{ route('admin.packages.index') }}" class="btn btn-outline-secondary">
                         <i class="ri-arrow-left-line me-1"></i> Back
                     </a>
                 </div>
@@ -25,472 +25,398 @@
         </div>
     </div>
 
-    <form action="{{ route('admin.packages.update', $package) }}" method="POST" enctype="multipart/form-data">
+    @if ($errors->any())
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>Validation Errors:</strong>
+            <ul class="mb-0">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
+
+    <form action="{{ route('admin.packages.update', $package) }}" method="POST" enctype="multipart/form-data" id="packageForm">
         @csrf
         @method('PUT')
-        <div class="row">
-            <!-- Main Content Column -->
-            <div class="col-lg-8">
-                <!-- Basic Information -->
-                <div class="card mb-3">
-                    <div class="card-header">
-                        <h5 class="card-title mb-0">Basic Information</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="mb-3">
-                            <label for="name" class="form-label">Package Name <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control @error('name') is-invalid @enderror"
-                                   id="name" name="name" value="{{ old('name', $package->name) }}" required>
-                            @error('name')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
+        
+        <!-- Tabs Navigation -->
+        <ul class="nav nav-tabs mb-4" id="packageTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="basic-tab" data-bs-toggle="tab" data-bs-target="#basic" type="button" role="tab">
+                    <i class="ri-information-line me-1"></i> Basic Info & Pricing
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="images-tab" data-bs-toggle="tab" data-bs-target="#images" type="button" role="tab">
+                    <i class="ri-image-line me-1"></i> Images
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="itinerary-tab" data-bs-toggle="tab" data-bs-target="#itinerary" type="button" role="tab">
+                    <i class="ri-route-line me-1"></i> Itinerary
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="inclusions-tab" data-bs-toggle="tab" data-bs-target="#inclusions" type="button" role="tab">
+                    <i class="ri-check-double-line me-1"></i> Inclusions & Exclusions
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="settings-tab" data-bs-toggle="tab" data-bs-target="#settings" type="button" role="tab">
+                    <i class="ri-settings-3-line me-1"></i> Settings & SEO
+                </button>
+            </li>
+        </ul>
 
-                        <div class="mb-3">
-                            <label for="short_description" class="form-label">Short Description <span class="text-danger">*</span></label>
-                            <textarea class="form-control @error('short_description') is-invalid @enderror"
-                                      id="short_description" name="short_description" rows="2" required>{{ old('short_description', $package->short_description) }}</textarea>
-                            @error('short_description')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="description" class="form-label">Description <span class="text-danger">*</span></label>
-                            <textarea class="form-control @error('description') is-invalid @enderror"
-                                      id="description" name="description" rows="5" required>{{ old('description', $package->description) }}</textarea>
-                            @error('description')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6">
+        <!-- Tabs Content -->
+        <div class="tab-content" id="packageTabsContent">
+            <!-- Basic Info & Pricing Tab -->
+            <div class="tab-pane fade show active" id="basic" role="tabpanel">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Basic Information</h5>
+                            </div>
+                            <div class="card-body">
                                 <div class="mb-3">
-                                    <label for="location" class="form-label">Location <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control @error('location') is-invalid @enderror"
-                                           id="location" name="location" value="{{ old('location', $package->location) }}" required>
-                                    @error('location')
+                                    <label for="name" class="form-label">Package Name <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control @error('name') is-invalid @enderror"
+                                           id="name" name="name" value="{{ old('name', $package->name) }}" required>
+                                    @error('name')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
-                            </div>
-                            <div class="col-md-6">
+
                                 <div class="mb-3">
-                                    <label for="category_id" class="form-label">Category <span class="text-danger">*</span></label>
-                                    <select class="form-select @error('category_id') is-invalid @enderror"
-                                            id="category_id" name="category_id" required>
-                                        <option value="">Select Category</option>
-                                        @foreach($categories as $category)
-                                        <option value="{{ $category->id }}" {{ old('category_id', $package->category_id) == $category->id ? 'selected' : '' }}>
-                                            {{ $category->name }}
-                                        </option>
-                                        @endforeach
+                                    <label for="description" class="form-label">Description <span class="text-danger">*</span></label>
+                                    <textarea class="form-control @error('description') is-invalid @enderror"
+                                              id="description" name="description" rows="5" required>{{ old('description', $package->description) }}</textarea>
+                                    @error('description')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="location" class="form-label">Location <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control @error('location') is-invalid @enderror"
+                                                   id="location" name="location" value="{{ old('location', $package->location) }}" required>
+                                            @error('location')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="category" class="form-label">Category</label>
+                                            <select class="form-select @error('category') is-invalid @enderror"
+                                                    id="category" name="category">
+                                                <option value="">Select Category</option>
+                                                <option value="cultural" {{ old('category', $package->category) === 'cultural' ? 'selected' : '' }}>Cultural Tours</option>
+                                                <option value="adventure" {{ old('category', $package->category) === 'adventure' ? 'selected' : '' }}>Adventure</option>
+                                                <option value="beach" {{ old('category', $package->category) === 'beach' ? 'selected' : '' }}>Beach & Marine</option>
+                                                <option value="spiritual" {{ old('category', $package->category) === 'spiritual' ? 'selected' : '' }}>Spiritual</option>
+                                                <option value="nature" {{ old('category', $package->category) === 'nature' ? 'selected' : '' }}>Nature</option>
+                                            </select>
+                                            @error('category')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label for="duration" class="form-label">Duration (Days) <span class="text-danger">*</span></label>
+                                            <input type="number" min="1" max="30"
+                                                   class="form-control @error('duration') is-invalid @enderror"
+                                                   id="duration" name="duration" value="{{ old('duration', $package->duration) }}" required>
+                                            @error('duration')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label for="max_participants" class="form-label">Max Participants</label>
+                                            <input type="number" min="1" max="100"
+                                                   class="form-control @error('max_participants') is-invalid @enderror"
+                                                   id="max_participants" name="max_participants" value="{{ old('max_participants', $package->max_participants) }}">
+                                            @error('max_participants')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label for="difficulty_level" class="form-label">Difficulty Level</label>
+                                            <select class="form-select @error('difficulty_level') is-invalid @enderror"
+                                                    id="difficulty_level" name="difficulty_level">
+                                                <option value="">Select Difficulty</option>
+                                                <option value="easy" {{ old('difficulty_level', $package->difficulty_level) === 'easy' ? 'selected' : '' }}>Easy</option>
+                                                <option value="moderate" {{ old('difficulty_level', $package->difficulty_level) === 'moderate' ? 'selected' : '' }}>Moderate</option>
+                                                <option value="challenging" {{ old('difficulty_level', $package->difficulty_level) === 'challenging' ? 'selected' : '' }}>Challenging</option>
+                                            </select>
+                                            @error('difficulty_level')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pricing -->
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Pricing</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label for="currency" class="form-label">Currency <span class="text-danger">*</span></label>
+                                    <select class="form-select @error('currency') is-invalid @enderror" id="currency" name="currency" required>
+                                        <option value="IDR" {{ old('currency', $package->currency) === 'IDR' ? 'selected' : '' }}>IDR - Indonesian Rupiah</option>
+                                        <option value="USD" {{ old('currency', $package->currency) === 'USD' ? 'selected' : '' }}>USD - US Dollar</option>
                                     </select>
-                                    @error('category_id')
+                                    @error('currency')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
-                            </div>
-                        </div>
 
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="mb-3">
-                                    <label for="duration_days" class="form-label">Duration Days <span class="text-danger">*</span></label>
-                                    <input type="number" min="1" max="30"
-                                           class="form-control @error('duration_days') is-invalid @enderror"
-                                           id="duration_days" name="duration_days" value="{{ old('duration_days', $package->duration_days) }}" required>
-                                    @error('duration_days')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="price" class="form-label">Adult Price <span class="text-danger">*</span></label>
+                                            <input type="number" step="0.01" min="0"
+                                                   class="form-control @error('price') is-invalid @enderror"
+                                                   id="price" name="price" value="{{ old('price', $package->price) }}" required>
+                                            @error('price')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="child_price" class="form-label">Child Price</label>
+                                            <input type="number" step="0.01" min="0"
+                                                   class="form-control @error('child_price') is-invalid @enderror"
+                                                   id="child_price" name="child_price" value="{{ old('child_price', $package->child_price) }}">
+                                            @error('child_price')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                            <div class="form-text">Leave empty if same as adult price</div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="col-md-4">
-                                <div class="mb-3">
-                                    <label for="duration_nights" class="form-label">Duration Nights <span class="text-danger">*</span></label>
-                                    <input type="number" min="0" max="30"
-                                           class="form-control @error('duration_nights') is-invalid @enderror"
-                                           id="duration_nights" name="duration_nights" value="{{ old('duration_nights', $package->duration_nights) }}" required>
-                                    @error('duration_nights')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="mb-3">
-                                    <label for="difficulty_level" class="form-label">Difficulty Level <span class="text-danger">*</span></label>
-                                    <select class="form-select @error('difficulty_level') is-invalid @enderror"
-                                            id="difficulty_level" name="difficulty_level" required>
-                                        <option value="easy" {{ old('difficulty_level', $package->difficulty_level) === 'easy' ? 'selected' : '' }}>Easy</option>
-                                        <option value="moderate" {{ old('difficulty_level', $package->difficulty_level) === 'moderate' ? 'selected' : '' }}>Moderate</option>
-                                        <option value="challenging" {{ old('difficulty_level', $package->difficulty_level) === 'challenging' ? 'selected' : '' }}>Challenging</option>
-                                        <option value="difficult" {{ old('difficulty_level', $package->difficulty_level) === 'difficult' ? 'selected' : '' }}>Difficult</option>
-                                    </select>
-                                    @error('difficulty_level')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="min_participants" class="form-label">Min Participants <span class="text-danger">*</span></label>
-                                    <input type="number" min="1" max="100"
-                                           class="form-control @error('min_participants') is-invalid @enderror"
-                                           id="min_participants" name="min_participants" value="{{ old('min_participants', $package->min_participants) }}" required>
-                                    @error('min_participants')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="max_participants" class="form-label">Max Participants <span class="text-danger">*</span></label>
-                                    <input type="number" min="1" max="100"
-                                           class="form-control @error('max_participants') is-invalid @enderror"
-                                           id="max_participants" name="max_participants" value="{{ old('max_participants', $package->max_participants) }}" required>
-                                    @error('max_participants')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="departure_city" class="form-label">Departure City <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control @error('departure_city') is-invalid @enderror"
-                                           id="departure_city" name="departure_city" value="{{ old('departure_city', $package->departure_city) }}" required>
-                                    @error('departure_city')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="meeting_point" class="form-label">Meeting Point <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control @error('meeting_point') is-invalid @enderror"
-                                           id="meeting_point" name="meeting_point" value="{{ old('meeting_point', $package->meeting_point) }}" required>
-                                    @error('meeting_point')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Pricing -->
-                <div class="card mb-3">
-                    <div class="card-header">
-                        <h5 class="card-title mb-0">Pricing</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="adult_price" class="form-label">Adult Price (IDR) <span class="text-danger">*</span></label>
-                                    <input type="number" step="1000" min="0"
-                                           class="form-control @error('adult_price') is-invalid @enderror"
-                                           id="adult_price" name="adult_price" value="{{ old('adult_price', $package->adult_price) }}" required>
-                                    @error('adult_price')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="commission_rate" class="form-label">Commission Rate (%) <span class="text-danger">*</span></label>
-                                    <input type="number" step="0.01" min="0" max="100"
-                                           class="form-control @error('commission_rate') is-invalid @enderror"
-                                           id="commission_rate" name="commission_rate" value="{{ old('commission_rate', $package->commission_rate) }}" required>
-                                    @error('commission_rate')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="child_price" class="form-label">Child Price (IDR)</label>
-                                    <input type="number" step="1000" min="0"
-                                           class="form-control @error('child_price') is-invalid @enderror"
-                                           id="child_price" name="child_price" value="{{ old('child_price', $package->child_price) }}">
-                                    @error('child_price')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="infant_price" class="form-label">Infant Price (IDR)</label>
-                                    <input type="number" step="1000" min="0"
-                                           class="form-control @error('infant_price') is-invalid @enderror"
-                                           id="infant_price" name="infant_price" value="{{ old('infant_price', $package->infant_price) }}">
-                                    @error('infant_price')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Inclusions & Exclusions -->
-                <div class="card mb-3">
-                    <div class="card-header">
-                        <h5 class="card-title mb-0">Inclusions & Exclusions</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="includes" class="form-label">What's Included</label>
-                                    <textarea class="form-control @error('includes') is-invalid @enderror"
-                                              id="includes" name="includes[]" rows="6"
-                                              placeholder="Enter each inclusion on a new line">{{ is_array($package->includes) ? implode("\n", $package->includes) : $package->includes }}</textarea>
-                                    @error('includes')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="excludes" class="form-label">What's Not Included</label>
-                                    <textarea class="form-control @error('excludes') is-invalid @enderror"
-                                              id="excludes" name="excludes[]" rows="6"
-                                              placeholder="Enter each exclusion on a new line">{{ is_array($package->excludes) ? implode("\n", $package->excludes) : $package->excludes }}</textarea>
-                                    @error('excludes')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Performance Stats -->
-                <div class="card mb-3">
-                    <div class="card-header">
-                        <h5 class="card-title mb-0"><i class="ri-bar-chart-line me-2"></i>Performance Stats</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="row text-center">
-                            <div class="col-md-4 mb-3">
-                                <div class="border rounded p-3">
-                                    <small class="text-muted d-block">Total Bookings</small>
-                                    <h4 class="mb-0">{{ $package->bookings()->count() }}</h4>
-                                </div>
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <div class="border rounded p-3">
-                                    <small class="text-muted d-block">Total Revenue</small>
-                                    <h4 class="mb-0">IDR {{ number_format($package->bookings()->sum('total_price') ?? 0, 0, ',', '.') }}</h4>
-                                </div>
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <div class="border rounded p-3">
-                                    <small class="text-muted d-block">Average Rating</small>
-                                    <h4 class="mb-0">{{ number_format($package->average_rating ?? 0, 1) }}/5</h4>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="border rounded p-3">
-                                    <small class="text-muted d-block">Total Reviews</small>
-                                    <h4 class="mb-0">{{ $package->total_reviews ?? 0 }}</h4>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="border rounded p-3">
-                                    <small class="text-muted d-block">Created</small>
-                                    <p class="mb-0">{{ $package->created_at->format('d M Y') }}</p>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="border rounded p-3">
-                                    <small class="text-muted d-block">Last Updated</small>
-                                    <p class="mb-0">{{ $package->updated_at->format('d M Y') }}</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- SEO Settings -->
-                <div class="card mb-3">
-                    <div class="card-header">
-                        <h5 class="card-title mb-0"><i class="ri-search-line me-2"></i>SEO Settings</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="mb-3">
-                            <label for="meta_title" class="form-label">Meta Title</label>
-                            <input type="text" class="form-control @error('meta_title') is-invalid @enderror"
-                                   id="meta_title" name="meta_title" value="{{ old('meta_title', $package->meta_title) }}"
-                                   maxlength="60">
-                            @error('meta_title')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                            <div class="form-text">Recommended: 50-60 characters</div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="meta_description" class="form-label">Meta Description</label>
-                            <textarea class="form-control @error('meta_description') is-invalid @enderror"
-                                      id="meta_description" name="meta_description" rows="3"
-                                      maxlength="160">{{ old('meta_description', $package->meta_description) }}</textarea>
-                            @error('meta_description')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                            <div class="form-text">Recommended: 150-160 characters</div>
-                        </div>
-
-                        <div class="mb-0">
-                            <label for="keywords" class="form-label">Keywords</label>
-                            <input type="text" class="form-control @error('keywords') is-invalid @enderror"
-                                   id="keywords" name="keywords" value="{{ old('keywords', $package->keywords) }}"
-                                   placeholder="mount batur, sunrise trekking, volcano tour">
-                            @error('keywords')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                            <div class="form-text">Separate keywords with commas</div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Sidebar Column -->
-            <div class="col-lg-4">
-                <!-- Featured Image -->
-                <div class="card mb-3">
-                    <div class="card-header">
-                        <h5 class="card-title mb-0">Featured Image</h5>
+            <!-- Images Tab -->
+            <div class="tab-pane fade" id="images" role="tabpanel">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Featured Image</h5>
+                            </div>
+                            <div class="card-body text-center">
+                                <div class="image-preview mb-3" style="min-height: 250px; border: 2px dashed #ddd; display: flex; align-items: center; justify-content: center;">
+                                    @if($package->featured_image)
+                                        <img id="image-preview" src="{{ asset('storage/' . $package->featured_image) }}" alt="Preview" style="max-width: 100%; max-height: 250px;">
+                                    @else
+                                        <img id="image-preview" src="#" alt="Preview" style="max-width: 100%; max-height: 250px; display: none;">
+                                        <div id="image-placeholder" class="text-muted">
+                                            <i class="ri-image-line" style="font-size: 48px;"></i>
+                                            <p class="mt-2">Upload featured image</p>
+                                        </div>
+                                    @endif
+                                </div>
+                                <input type="file" class="form-control @error('featured_image') is-invalid @enderror"
+                                       id="featured_image" name="featured_image" accept="image/*" onchange="previewImage(event)">
+                                @error('featured_image')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                                <div class="form-text">Max file size: 5MB. Recommended: 1200x800px</div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="card-body text-center">
-                        @if($package->main_image)
-                        <div class="mb-3">
-                            <img src="{{ Storage::url($package->main_image) }}" 
-                                 alt="{{ $package->name }}" 
-                                 class="img-fluid rounded"
-                                 style="max-height: 200px; object-fit: cover;">
-                        </div>
-                        @endif
-                        <div class="mb-3">
-                            <input type="file" class="form-control @error('main_image') is-invalid @enderror"
-                                   id="main_image" name="main_image" accept="image/*">
-                            @error('main_image')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                            <div class="form-text">Max file size: 5MB. Leave empty to keep current image</div>
-                        </div>
-                    </div>
-                </div>
 
-                <!-- Settings -->
-                <div class="card mb-3">
-                    <div class="card-header">
-                        <h5 class="card-title mb-0">Settings</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="mb-3">
-                            <label for="status" class="form-label">Status</label>
-                            <select class="form-select @error('status') is-invalid @enderror" id="status" name="status">
-                                <option value="draft" {{ old('status', $package->status) === 'draft' ? 'selected' : '' }}>Draft</option>
-                                <option value="active" {{ old('status', $package->status) === 'active' ? 'selected' : '' }}>Active</option>
-                                <option value="inactive" {{ old('status', $package->status) === 'inactive' ? 'selected' : '' }}>Inactive</option>
-                                <option value="archived" {{ old('status', $package->status) === 'archived' ? 'selected' : '' }}>Archived</option>
-                            </select>
-                            @error('status')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="form-check mb-2">
-                            <input class="form-check-input" type="checkbox" id="is_featured" name="is_featured" value="1"
-                                   {{ old('is_featured', $package->is_featured) ? 'checked' : '' }}>
-                            <label class="form-check-label" for="is_featured">
-                                Featured Package
-                            </label>
-                        </div>
-
-                        <div class="form-check mb-2">
-                            <input class="form-check-input" type="checkbox" id="is_popular" name="is_popular" value="1"
-                                   {{ old('is_popular', $package->is_popular) ? 'checked' : '' }}>
-                            <label class="form-check-label" for="is_popular">
-                                Popular Package
-                            </label>
-                        </div>
-
-                        <div class="form-check mb-0">
-                            <input class="form-check-input" type="checkbox" id="instant_booking" name="instant_booking" value="1"
-                                   {{ old('instant_booking', $package->instant_booking) ? 'checked' : '' }}>
-                            <label class="form-check-label" for="instant_booking">
-                                Allow Instant Booking
-                            </label>
+                    <div class="col-lg-6">
+                        <div class="card mb-3">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="card-title mb-0">Gallery Images</h5>
+                                <button type="button" class="btn btn-sm btn-primary" onclick="addGalleryImage()">
+                                    <i class="ri-add-line"></i> Add Image
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <div id="gallery-container"></div>
+                                <div class="form-text">Recommended: 1200x800px, Max 2MB per image</div>
+                            </div>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- Tags Section -->
-                <div class="card mb-3">
-                    <div class="card-header">
-                        <h5 class="card-title mb-0">
-                            <i class="ri-price-tag-3-line"></i> Tags
-                        </h5>
-                        <small class="text-muted">Select tags to help visitors find this package</small>
+            <!-- Itinerary Tab -->
+            <div class="tab-pane fade" id="itinerary" role="tabpanel">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">Itinerary</h5>
+                        <button type="button" class="btn btn-sm btn-primary" onclick="addItineraryDay()">
+                            <i class="ri-add-line"></i> Add Day
+                        </button>
                     </div>
                     <div class="card-body">
-                        @if(isset($tags) && $tags->count() > 0)
-                            @foreach($tags as $type => $typeTags)
-                            <div class="mb-3 pb-3 {{ !$loop->last ? 'border-bottom' : '' }}">
-                                <h6 class="text-uppercase fw-bold mb-2" style="color: #6c757d; font-size: 0.75rem;">
-                                    {{ ucfirst($type) }}
-                                </h6>
-                                <div class="d-flex flex-wrap gap-2">
-                                    @foreach($typeTags as $tag)
-                                    <div class="form-check">
-                                        <input class="form-check-input" 
-                                               type="checkbox" 
-                                               name="tags[]" 
-                                               value="{{ $tag->id }}"
-                                               id="tag_{{ $tag->id }}"
-                                               {{ in_array($tag->id, old('tags', $package->tags->pluck('id')->toArray())) ? 'checked' : '' }}>
-                                        <label class="form-check-label" for="tag_{{ $tag->id }}">
-                                            @if($tag->icon)<span class="me-1">{{ $tag->icon }}</span>@endif{{ $tag->name }}
-                                        </label>
-                                    </div>
-                                    @endforeach
+                        <div id="itinerary-container"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Inclusions & Exclusions Tab -->
+            <div class="tab-pane fade" id="inclusions" role="tabpanel">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="card-title mb-0">What's Included</h5>
+                                <button type="button" class="btn btn-sm btn-success" onclick="addInclusion()">
+                                    <i class="ri-add-line"></i> Add
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <div id="inclusions-container"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="card-title mb-0">What's Not Included</h5>
+                                <button type="button" class="btn btn-sm btn-danger" onclick="addExclusion()">
+                                    <i class="ri-add-line"></i> Add
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <div id="exclusions-container"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings & SEO Tab -->
+            <div class="tab-pane fade" id="settings" role="tabpanel">
+                <div class="row">
+                    <div class="col-lg-4">
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0"><i class="ri-price-tag-3-line"></i> Tags</h5>
+                            </div>
+                            <div class="card-body">
+                                <label for="tags" class="form-label">Select Tags</label>
+                                <select id="tags" name="tags[]" class="form-select" multiple>
+                                    @if(isset($tags) && $tags->count() > 0)
+                                        @foreach($tags as $type => $typeTags)
+                                            <optgroup label="{{ ucfirst($type) }}">
+                                                @foreach($typeTags as $tag)
+                                                    <option value="{{ $tag->id }}" 
+                                                        {{ collect(old('tags', $package->tags->pluck('id')->toArray()))->contains($tag->id) ? 'selected' : '' }}>
+                                                        {{ $tag->emoji ?? '' }} {{ $tag->name }}
+                                                    </option>
+                                                @endforeach
+                                            </optgroup>
+                                        @endforeach
+                                    @endif
+                                </select>
+                                <div class="form-text">Select multiple tags</div>
+                            </div>
+                        </div>
+                        <!-- Settings -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Settings</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label for="status" class="form-label">Status</label>
+                                    <select class="form-select @error('status') is-invalid @enderror" id="status" name="status">
+                                        <option value="draft" {{ old('status', $package->status) === 'draft' ? 'selected' : '' }}>Draft</option>
+                                        <option value="active" {{ old('status', $package->status) === 'active' ? 'selected' : '' }}>Active</option>
+                                        <option value="inactive" {{ old('status', $package->status) === 'inactive' ? 'selected' : '' }}>Inactive</option>
+                                    </select>
+                                    @error('status')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
                             </div>
-                            @endforeach
-                        @else
-                            <div class="alert alert-warning mb-0">
-                                No tags available. Please create tags first.
-                            </div>
-                        @endif
-                    </div>
-                </div>
-
-                <!-- Action Buttons -->
-                <div class="card">
-                    <div class="card-body">
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="ri-save-line me-1"></i> Update Package
-                            </button>
-                            <a href="{{ route('admin.packages.show', $package) }}" class="btn btn-outline-info">
-                                <i class="ri-eye-line me-1"></i> View Package
-                            </a>
-                            <button type="button" onclick="saveDraft()" class="btn btn-outline-secondary">
-                                <i class="ri-draft-line me-1"></i> Save as Draft
-                            </button>
                         </div>
                     </div>
+
+                    <div class="col-lg-8">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0"><i class="ri-search-line"></i> SEO Settings</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label for="meta_title" class="form-label">Meta Title</label>
+                                    <input type="text" class="form-control @error('meta_title') is-invalid @enderror"
+                                           id="meta_title" name="meta_title" value="{{ old('meta_title', $package->meta_title) }}" maxlength="60">
+                                    @error('meta_title')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                    <div class="form-text">Recommended: 50-60 characters</div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="meta_description" class="form-label">Meta Description</label>
+                                    <textarea class="form-control @error('meta_description') is-invalid @enderror"
+                                              id="meta_description" name="meta_description" rows="3" maxlength="160">{{ old('meta_description', $package->meta_description) }}</textarea>
+                                    @error('meta_description')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                    <div class="form-text">Recommended: 150-160 characters</div>
+                                </div>
+
+                                <div class="mb-0">
+                                    <label for="keywords" class="form-label">Keywords</label>
+                                    <input type="text" class="form-control @error('keywords') is-invalid @enderror"
+                                           id="keywords" name="keywords" value="{{ old('keywords', $package->keywords) }}"
+                                           placeholder="keyword1, keyword2, keyword3">
+                                    @error('keywords')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons-fixed">
+            <div class="container-fluid">
+                <div class="d-flex gap-2 justify-content-end">
+                    <a href="{{ route('admin.packages.index') }}" class="btn btn-secondary">
+                        <i class="ri-arrow-left-line"></i> Cancel
+                    </a>
+                    <button type="button" class="btn btn-outline-secondary" onclick="saveDraft()">
+                        <i class="ri-draft-line"></i> Save as Draft
+                    </button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="ri-save-line"></i> Update Package
+                    </button>
                 </div>
             </div>
         </div>
@@ -508,6 +434,30 @@
 .select2-container--bootstrap-5 .select2-selection {
     border-color: #dee2e6;
 }
+
+/* Fixed Bottom Action Buttons */
+.action-buttons-fixed {
+    position: fixed;
+    bottom: 0;
+    left: 250px;
+    right: 0;
+    background: #fff;
+    padding: 15px 0;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+    z-index: 1000;
+    border-top: 1px solid #dee2e6;
+}
+
+@media (max-width: 991.98px) {
+    .action-buttons-fixed {
+        left: 0;
+    }
+}
+
+/* Add padding to bottom of content to prevent overlap */
+body {
+    padding-bottom: 80px;
+}
 </style>
 @endpush
 
@@ -524,11 +474,430 @@ $(document).ready(function() {
     });
 });
 
+// Preview featured image
+function previewImage(event) {
+    const file = event.target.files[0];
+    const preview = document.getElementById('image-preview');
+    const placeholder = document.getElementById('image-placeholder');
+
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            preview.src = e.target.result;
+            preview.style.display = 'block';
+            placeholder.style.display = 'none';
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
+// Add gallery image
+let galleryCounter = 0;
+function addGalleryImage() {
+    galleryCounter++;
+    const container = document.getElementById('gallery-container');
+    const imageHtml = `
+        <div class="border rounded p-3 mb-3" id="gallery-${galleryCounter}">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6 class="mb-0">Image ${galleryCounter}</h6>
+                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeGalleryImage(${galleryCounter})">
+                    <i class="ri-delete-bin-line"></i>
+                </button>
+            </div>
+            <div class="image-preview mb-2" style="min-height: 150px; border: 2px dashed #ddd; display: flex; align-items: center; justify-content: center;">
+                <img id="gallery-preview-${galleryCounter}" src="#" alt="Preview" style="max-width: 100%; max-height: 150px; display: none;">
+                <div id="gallery-placeholder-${galleryCounter}" class="text-muted text-center">
+                    <i class="ri-image-line" style="font-size: 32px;"></i>
+                    <p class="mt-1 mb-0" style="font-size: 0.875rem;">Upload image</p>
+                </div>
+            </div>
+            <input type="file" class="form-control form-control-sm" 
+                   name="gallery_images[]" 
+                   accept="image/*"
+                   onchange="previewGalleryImage(event, ${galleryCounter})">
+        </div>
+    `;
+    container.insertAdjacentHTML('beforeend', imageHtml);
+}
+
+// Remove gallery image
+function removeGalleryImage(imageId) {
+    document.getElementById(`gallery-${imageId}`).remove();
+}
+
+// Preview gallery image
+function previewGalleryImage(event, imageId) {
+    const file = event.target.files[0];
+    const preview = document.getElementById(`gallery-preview-${imageId}`);
+    const placeholder = document.getElementById(`gallery-placeholder-${imageId}`);
+
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            preview.src = e.target.result;
+            preview.style.display = 'block';
+            placeholder.style.display = 'none';
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
+// Add itinerary day
+let dayCounter = 0;
+function addItineraryDay() {
+    const container = document.getElementById('itinerary-container');
+    // Recalculate day number based on existing days
+    const existingDays = container.querySelectorAll('.border.rounded.p-3.mb-3');
+    dayCounter = existingDays.length + 1;
+    const dayHtml = `
+        <div class="border rounded p-3 mb-3" id="day-${dayCounter}">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6 class="mb-0">Day ${dayCounter}</h6>
+                <div>
+                    <button type="button" class="btn btn-sm btn-outline-primary me-1" onclick="addDayItem(${dayCounter})">
+                        <i class="ri-add-line"></i> Add Item
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeDay(${dayCounter})">
+                        <i class="ri-delete-bin-line"></i>
+                    </button>
+                </div>
+            </div>
+            <div id="day-${dayCounter}-items">
+                <div class="item-group mb-2" id="day-${dayCounter}-item-0">
+                    <div class="mb-2">
+                        <input type="text" class="form-control form-control-sm"
+                               name="itinerary[${dayCounter}][0][title]"
+                               placeholder="Activity title">
+                    </div>
+                    <div>
+                        <textarea class="form-control form-control-sm"
+                                  name="itinerary[${dayCounter}][0][description]"
+                                  rows="2"
+                                  placeholder="Activity description"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    container.insertAdjacentHTML('beforeend', dayHtml);
+}
+
+// Add item to a specific day
+function addDayItem(dayId) {
+    const itemsContainer = document.getElementById(`day-${dayId}-items`);
+    const currentItems = itemsContainer.querySelectorAll('.item-group');
+    const newItemIndex = currentItems.length;
+    
+    const itemHtml = `
+        <div class="item-group mb-2" id="day-${dayId}-item-${newItemIndex}">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+                <small class="text-muted">Item ${newItemIndex + 1}</small>
+                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeDayItem(${dayId}, ${newItemIndex})">
+                    <i class="ri-delete-bin-line"></i>
+                </button>
+            </div>
+            <div class="mb-2">
+                <input type="text" class="form-control form-control-sm"
+                       name="itinerary[${dayId}][${newItemIndex}][title]"
+                       placeholder="Activity title">
+            </div>
+            <div>
+                <textarea class="form-control form-control-sm"
+                          name="itinerary[${dayId}][${newItemIndex}][description]"
+                          rows="2"
+                          placeholder="Activity description"></textarea>
+            </div>
+        </div>
+    `;
+    itemsContainer.insertAdjacentHTML('beforeend', itemHtml);
+}
+
+// Remove a specific item from a day
+function removeDayItem(dayId, itemIndex) {
+    document.getElementById(`day-${dayId}-item-${itemIndex}`).remove();
+}
+
+// Remove itinerary day
+function removeDay(dayId) {
+    document.getElementById(`day-${dayId}`).remove();
+}
+
+// Add inclusion
+let inclusionCounter = 0;
+function addInclusion() {
+    inclusionCounter++;
+    const container = document.getElementById('inclusions-container');
+    const html = `
+        <div class="input-group mb-2" id="inclusion-${inclusionCounter}">
+            <span class="input-group-text"><i class="ri-check-line text-success"></i></span>
+            <input type="text" class="form-control" name="inclusions[]" placeholder="e.g., Hotel pickup and drop-off">
+            <button type="button" class="btn btn-outline-danger" onclick="removeInclusion(${inclusionCounter})">
+                <i class="ri-delete-bin-line"></i>
+            </button>
+        </div>
+    `;
+    container.insertAdjacentHTML('beforeend', html);
+}
+
+// Remove inclusion
+function removeInclusion(id) {
+    document.getElementById(`inclusion-${id}`).remove();
+}
+
+// Add exclusion
+let exclusionCounter = 0;
+function addExclusion() {
+    exclusionCounter++;
+    const container = document.getElementById('exclusions-container');
+    const html = `
+        <div class="input-group mb-2" id="exclusion-${exclusionCounter}">
+            <span class="input-group-text"><i class="ri-close-line text-danger"></i></span>
+            <input type="text" class="form-control" name="exclusions[]" placeholder="e.g., Personal expenses">
+            <button type="button" class="btn btn-outline-danger" onclick="removeExclusion(${exclusionCounter})">
+                <i class="ri-delete-bin-line"></i>
+            </button>
+        </div>
+    `;
+    container.insertAdjacentHTML('beforeend', html);
+}
+
+// Remove exclusion
+function removeExclusion(id) {
+    document.getElementById(`exclusion-${id}`).remove();
+}
+
+// Initialize with first items or load existing data
+document.addEventListener('DOMContentLoaded', function() {
+    // Check if we have old input (from validation errors)
+    const oldItinerary = @json(old('itinerary', []));
+    const hasOldData = Object.keys(oldItinerary).length > 0;
+    
+    if (hasOldData) {
+        // Restore from old() data (validation error scenario)
+        console.log('Restoring from old() data');
+        Object.keys(oldItinerary).forEach(function(dayNum) {
+            dayCounter++;
+            const items = oldItinerary[dayNum];
+            const dayHtml = document.createElement('div');
+            dayHtml.className = 'border rounded p-3 mb-3';
+            dayHtml.id = 'day-' + dayCounter;
+            
+            let itemsHtml = '';
+            Object.keys(items).forEach(function(itemIdx) {
+                const item = items[itemIdx];
+                itemsHtml += `
+                    <div class="item-group mb-2" id="day-${dayCounter}-item-${itemIdx}">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <small class="text-muted">Item ${parseInt(itemIdx) + 1}</small>
+                            ${itemIdx > 0 ? `<button type="button" class="btn btn-sm btn-outline-danger" onclick="removeDayItem(${dayCounter}, ${itemIdx})"><i class="ri-delete-bin-line"></i></button>` : ''}
+                        </div>
+                        <div class="mb-2">
+                            <input type="text" class="form-control form-control-sm"
+                                   name="itinerary[${dayCounter}][${itemIdx}][title]"
+                                   value="${item.title || ''}"
+                                   placeholder="Activity title">
+                        </div>
+                        <div>
+                            <textarea class="form-control form-control-sm"
+                                      name="itinerary[${dayCounter}][${itemIdx}][description]"
+                                      rows="2"
+                                      placeholder="Activity description">${item.description || ''}</textarea>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            dayHtml.innerHTML = `
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h6 class="mb-0">Day ${dayCounter}</h6>
+                    <div>
+                        <button type="button" class="btn btn-sm btn-outline-primary me-1" onclick="addDayItem(${dayCounter})">
+                            <i class="ri-add-line"></i> Add Item
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeDay(${dayCounter})">
+                            <i class="ri-delete-bin-line"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="day-${dayCounter}-items">
+                    ${itemsHtml}
+                </div>
+            `;
+            document.getElementById('itinerary-container').appendChild(dayHtml);
+        });
+    } else {
+        // Load from database (normal edit scenario)
+        const itinerariesRaw = {!! json_encode($package->itineraries ?? []) !!} || [];
+        
+        // Group itineraries by day_number
+        const itineraryByDay = {};
+        itinerariesRaw.forEach(function(item) {
+            if (!itineraryByDay[item.day_number]) {
+                itineraryByDay[item.day_number] = [];
+            }
+            itineraryByDay[item.day_number].push(item);
+        });
+
+        // Load itinerary data grouped by day
+        if (Object.keys(itineraryByDay).length > 0) {
+            Object.keys(itineraryByDay).sort((a, b) => a - b).forEach(function(dayNum) {
+                const items = itineraryByDay[dayNum];
+                dayCounter++;
+                const dayHtml = document.createElement('div');
+                dayHtml.className = 'border rounded p-3 mb-3';
+                dayHtml.id = 'day-' + dayCounter;
+                
+                let itemsHtml = '';
+                items.forEach(function(item, idx) {
+                    itemsHtml += `
+                        <div class="item-group mb-2" id="day-${dayCounter}-item-${idx}">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <small class="text-muted">Item ${idx + 1}</small>
+                                ${idx > 0 ? `<button type="button" class="btn btn-sm btn-outline-danger" onclick="removeDayItem(${dayCounter}, ${idx})"><i class="ri-delete-bin-line"></i></button>` : ''}
+                            </div>
+                            <div class="mb-2">
+                                <input type="text" class="form-control form-control-sm"
+                                       name="itinerary[${dayCounter}][${idx}][title]"
+                                       value="${item.title || ''}"
+                                       placeholder="Activity title">
+                            </div>
+                            <div>
+                                <textarea class="form-control form-control-sm"
+                                          name="itinerary[${dayCounter}][${idx}][description]"
+                                          rows="2"
+                                          placeholder="Activity description">${item.description || ''}</textarea>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                dayHtml.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="mb-0">Day ${dayCounter}</h6>
+                        <div>
+                            <button type="button" class="btn btn-sm btn-outline-primary me-1" onclick="addDayItem(${dayCounter})">
+                                <i class="ri-add-line"></i> Add Item
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeDay(${dayCounter})">
+                                <i class="ri-delete-bin-line"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="day-${dayCounter}-items">
+                        ${itemsHtml}
+                    </div>
+                `;
+                document.getElementById('itinerary-container').appendChild(dayHtml);
+            });
+        } else {
+            addItineraryDay();
+        }
+    }
+
+    // Load inclusions with old() support
+    const inclusionData = {!! json_encode(old('inclusions') ?? $package->inclusions->pluck('description') ?? []) !!} || [];
+    const exclusionData = {!! json_encode(old('exclusions') ?? $package->exclusions->pluck('description') ?? []) !!} || [];
+    const galleryData = {!! json_encode($package->gallery_images ?? []) !!} || [];
+    
+    if (Array.isArray(inclusionData) && inclusionData.length > 0) {
+        inclusionData.forEach(function(inclusion) {
+            inclusionCounter++;
+            const incValue = inclusion || '';
+            const inclusionHtml = document.createElement('div');
+            inclusionHtml.className = 'input-group mb-2';
+            inclusionHtml.id = 'inclusion-' + inclusionCounter;
+            inclusionHtml.innerHTML = `
+                <span class="input-group-text"><i class="ri-check-line text-success"></i></span>
+                <input type="text" class="form-control" name="inclusions[]" value="" placeholder="e.g., Hotel pickup and drop-off">
+                <button type="button" class="btn btn-outline-danger" onclick="removeInclusion(${inclusionCounter})">
+                    <i class="ri-delete-bin-line"></i>
+                </button>
+            `;
+            document.getElementById('inclusions-container').appendChild(inclusionHtml);
+            inclusionHtml.querySelector('input[name="inclusions[]"]').value = incValue;
+        });
+    }
+
+    if (Array.isArray(exclusionData) && exclusionData.length > 0) {
+        exclusionData.forEach(function(exclusion) {
+            exclusionCounter++;
+            const excValue = exclusion || '';
+            const exclusionHtml = document.createElement('div');
+            exclusionHtml.className = 'input-group mb-2';
+            exclusionHtml.id = 'exclusion-' + exclusionCounter;
+            exclusionHtml.innerHTML = `
+                <span class="input-group-text"><i class="ri-close-line text-danger"></i></span>
+                <input type="text" class="form-control" name="exclusions[]" value="" placeholder="e.g., Personal expenses">
+                <button type="button" class="btn btn-outline-danger" onclick="removeExclusion(${exclusionCounter})">
+                    <i class="ri-delete-bin-line"></i>
+                </button>
+            `;
+            document.getElementById('exclusions-container').appendChild(exclusionHtml);
+            exclusionHtml.querySelector('input[name="exclusions[]"]').value = excValue;
+        });
+    }
+
+    if (Array.isArray(galleryData) && galleryData.length > 0) {
+        galleryData.forEach(function(image) {
+            galleryCounter++;
+            const src = "{{ asset('storage') }}/" + image;
+            const galleryHtml = `
+                <div class="border rounded p-3 mb-3" id="gallery-${galleryCounter}">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="mb-0">Image ${galleryCounter}</h6>
+                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeGalleryImage(${galleryCounter})">
+                            <i class="ri-delete-bin-line"></i>
+                        </button>
+                    </div>
+                    <div class="image-preview mb-2" style="min-height: 150px; border: 2px dashed #ddd; display: flex; align-items: center; justify-content: center;">
+                        <img src="${src}" alt="Gallery" style="max-width: 100%; max-height: 150px;">
+                    </div>
+                    <input type="file" class="form-control form-control-sm" 
+                           name="gallery_images[]" 
+                           accept="image/*"
+                           onchange="previewGalleryImage(event, ${galleryCounter})">
+                    <div class="form-text">Leave empty to keep existing image</div>
+                </div>
+            `;
+            document.getElementById('gallery-container').insertAdjacentHTML('beforeend', galleryHtml);
+        });
+    }
+});
+
 // Save as draft
 function saveDraft() {
     document.getElementById('status').value = 'draft';
-    document.querySelector('form').submit();
+    document.getElementById('packageForm').submit();
 }
+
+// Debug: Log form data before submission
+document.getElementById('packageForm').addEventListener('submit', function(e) {
+    const formData = new FormData(this);
+    console.log('=== FORM SUBMISSION DEBUG ===');
+    
+    // Log itinerary data
+    const itineraryData = {};
+    for (let [key, value] of formData.entries()) {
+        if (key.startsWith('itinerary[')) {
+            console.log(key, '=', value);
+            itineraryData[key] = value;
+        }
+    }
+    
+    console.log('Total itinerary fields:', Object.keys(itineraryData).length);
+    console.log('=== END DEBUG ===');
+    
+    // Allow form to submit normally
+    // Remove the e.preventDefault() to let form submit
+});
+
+// Auto-generate meta title from name
+document.getElementById('name').addEventListener('input', function() {
+    const metaTitle = document.getElementById('meta_title');
+    if (!metaTitle.value) {
+        metaTitle.value = this.value;
+    }
+});
 
 // Character counter for meta fields
 function addCharacterCounter(inputId, maxLength) {
@@ -541,24 +910,17 @@ function addCharacterCounter(inputId, maxLength) {
     counter.innerHTML = `<span id="${inputId}-count">0</span>/${maxLength}`;
     parent.appendChild(counter);
 
-    function updateCounter() {
-        const count = input.value.length;
-        const countEl = document.getElementById(`${inputId}-count`);
-        if (countEl) {
-            countEl.textContent = count;
-            counter.classList.remove('text-warning', 'text-danger');
-            if (count > maxLength * 0.8) {
-                counter.classList.add('text-warning');
-            }
-            if (count > maxLength * 0.95) {
-                counter.classList.remove('text-warning');
-                counter.classList.add('text-danger');
-            }
+    input.addEventListener('input', function() {
+        const count = this.value.length;
+        document.getElementById(`${inputId}-count`).textContent = count;
+        counter.classList.remove('text-warning', 'text-danger');
+        if (count > maxLength * 0.8) {
+            counter.classList.add('text-warning');
         }
-    }
-
-    input.addEventListener('input', updateCounter);
-    updateCounter(); // Initial count
+        if (count > maxLength * 0.95) {
+            counter.classList.add('text-danger');
+        }
+    });
 }
 
 document.addEventListener('DOMContentLoaded', function() {
