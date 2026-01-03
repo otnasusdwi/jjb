@@ -16,9 +16,12 @@ class LandingController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        // Get destination tags for experience section
+        // Get destination tags with their galleries for experience section
         $destinationTags = \App\Models\Tag::active()
             ->ofType('destination')
+            ->with(['galleries' => function($query) {
+                $query->orderBy('order')->limit(3);
+            }])
             ->ordered()
             ->get();
 
@@ -27,7 +30,7 @@ class LandingController extends Controller
 
     public function showPackage($slug)
     {
-        $package = TravelPackage::with('category')
+        $package = TravelPackage::with(['tags', 'itineraries', 'inclusions', 'exclusions', 'galleries'])
             ->where('slug', $slug)
             ->where('status', 'active')
             ->firstOrFail();

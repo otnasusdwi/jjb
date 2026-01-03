@@ -141,18 +141,39 @@
         .experience-card {
             background: linear-gradient(135deg, var(--primary-orange) 0%, var(--dark-orange) 100%);
             border-radius: 15px;
-            padding: 40px 20px;
+            padding: 0;
             text-align: center;
             color: white;
             transition: all 0.3s;
             cursor: pointer;
             height: 100%;
-            min-height: 280px;
+            min-height: 400px;
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            justify-content: flex-end;
             position: relative;
             overflow: hidden;
+        }
+
+        .experience-card-gallery {
+            width: 100%;
+            height: 300px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 0;
+        }
+
+        .experience-card-gallery .carousel-item img {
+            height: 300px;
+            object-fit: cover;
+        }
+
+        .experience-card-content {
+            position: relative;
+            z-index: 1;
+            padding: 2rem 1.5rem;
+            background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.7) 100%);
         }
         
         .experience-card:hover {
@@ -180,6 +201,7 @@
             justify-content: center;
             font-size: 1.5rem;
             font-weight: bold;
+            z-index: 2;
         }
         
         .experience-card h3 {
@@ -196,6 +218,8 @@
             padding: 10px 30px;
             font-weight: 600;
             border-radius: 25px;
+            cursor: pointer;
+            display: inline-block;
         }
         
         .experience-card .btn:hover {
@@ -472,18 +496,64 @@
                 @foreach($destinationTags as $tag)
                 <div class="col-md-4">
                     <div class="experience-card" data-tag-id="{{ $tag->id }}" data-tag-slug="{{ $tag->slug }}" onclick="filterByTag({{ $tag->id }}, '{{ $tag->name }}')">
-                        <h3>{{ strtoupper($tag->name) }}</h3>
-                        <p>{{ $tag->description }}</p>
-                        <span class="btn">Explore Packages</span>
+                        @if($tag->galleries && $tag->galleries->count() > 0)
+                        <div class="experience-card-gallery">
+                            <div id="carousel{{ $tag->id }}" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
+                                <div class="carousel-inner">
+                                    @foreach($tag->galleries as $index => $gallery)
+                                    <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
+                                        <img src="{{ asset('storage/' . $gallery->image_path) }}" alt="{{ $tag->name }}">
+                                    </div>
+                                    @endforeach
+                                </div>
+                                @if($tag->galleries->count() > 1)
+                                <button class="carousel-control-prev" type="button" data-bs-target="#carousel{{ $tag->id }}" data-bs-slide="prev" style="width: 5%; background: rgba(0,0,0,0.3);">
+                                    <span class="carousel-control-prev-icon"></span>
+                                </button>
+                                <button class="carousel-control-next" type="button" data-bs-target="#carousel{{ $tag->id }}" data-bs-slide="next" style="width: 5%; background: rgba(0,0,0,0.3);">
+                                    <span class="carousel-control-next-icon"></span>
+                                </button>
+                                @endif
+                            </div>
+                        </div>
+                        @endif
+                        <div class="experience-card-content">
+                            <h3>{{ strtoupper($tag->name) }}</h3>
+                            <p>{{ $tag->description ?? ucfirst($tag->name) . ' Island packages' }}</p>
+                            <button class="btn">Explore Packages</button>
+                        </div>
                     </div>
                 </div>
                 @endforeach
                 
                 <div class="col-md-4">
                     <div class="experience-card" onclick="window.location.href='#contact'">
-                        <h3>CUSTOM</h3>
-                        <p>Tailored Experiences</p>
-                        <span class="btn">Contact Us</span>
+                        <div class="experience-card-gallery">
+                            <div id="carouselCustom" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
+                                <div class="carousel-inner">
+                                    <div class="carousel-item active">
+                                        <img src="https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=600&h=300&fit=crop" alt="Custom Tour">
+                                    </div>
+                                    <div class="carousel-item">
+                                        <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=300&fit=crop" alt="Custom Tour">
+                                    </div>
+                                    <div class="carousel-item">
+                                        <img src="https://images.unsplash.com/photo-1522383507921-f0d4797e56b2?w=600&h=300&fit=crop" alt="Custom Tour">
+                                    </div>
+                                </div>
+                                <button class="carousel-control-prev" type="button" data-bs-target="#carouselCustom" data-bs-slide="prev" style="width: 5%; background: rgba(0,0,0,0.3);">
+                                    <span class="carousel-control-prev-icon"></span>
+                                </button>
+                                <button class="carousel-control-next" type="button" data-bs-target="#carouselCustom" data-bs-slide="next" style="width: 5%; background: rgba(0,0,0,0.3);">
+                                    <span class="carousel-control-next-icon"></span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="experience-card-content">
+                            <h3>CUSTOM</h3>
+                            <p>Tailored Experiences</p>
+                            <button class="btn">Contact Us</button>
+                        </div>
                     </div>
                 </div>
             </div>
