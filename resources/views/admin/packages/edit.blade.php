@@ -797,7 +797,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Load inclusions with old() support
     const inclusionData = {!! json_encode(old('inclusions') ?? $package->inclusions->pluck('description') ?? []) !!} || [];
     const exclusionData = {!! json_encode(old('exclusions') ?? $package->exclusions->pluck('description') ?? []) !!} || [];
-    const galleryData = {!! json_encode($package->gallery_images ?? []) !!} || [];
+    const galleryData = {!! json_encode($package->galleries ?? []) !!} || [];
     
     if (Array.isArray(inclusionData) && inclusionData.length > 0) {
         inclusionData.forEach(function(inclusion) {
@@ -838,31 +838,42 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     if (Array.isArray(galleryData) && galleryData.length > 0) {
-        galleryData.forEach(function(image) {
+        galleryData.forEach(function(gallery) {
             galleryCounter++;
-            const src = "{{ asset('storage') }}/" + image;
+            const src = "{{ asset('storage') }}/" + gallery.image_path;
             const galleryHtml = `
-                <div class="border rounded p-3 mb-3" id="gallery-${galleryCounter}">
+                <div class="border rounded p-3 mb-3" id="gallery-${galleryCounter}" data-gallery-id="${gallery.id}">
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <h6 class="mb-0">Image ${galleryCounter}</h6>
-                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeGalleryImage(${galleryCounter})">
-                            <i class="ri-delete-bin-line"></i>
+                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeExistingGallery(${galleryCounter}, ${gallery.id})">
+                            <i class="ri-delete-bin-line"></i> Delete
                         </button>
                     </div>
                     <div class="image-preview mb-2" style="min-height: 150px; border: 2px dashed #ddd; display: flex; align-items: center; justify-content: center;">
                         <img src="${src}" alt="Gallery" style="max-width: 100%; max-height: 150px;">
                     </div>
-                    <input type="file" class="form-control form-control-sm" 
-                           name="gallery_images[]" 
-                           accept="image/*"
-                           onchange="previewGalleryImage(event, ${galleryCounter})">
-                    <div class="form-text">Leave empty to keep existing image</div>
+                    <input type="hidden" name="existing_galleries[]" value="${gallery.id}">
+                    <div class="form-text">Existing image - click delete to remove</div>
                 </div>
             `;
             document.getElementById('gallery-container').insertAdjacentHTML('beforeend', galleryHtml);
         });
     }
 });
+
+// Remove existing gallery image (mark for deletion)
+function removeExistingGallery(galleryId, dbId) {
+    const galleryDiv = document.getElementById(`gallery-${galleryId}`);
+    // Add hidden input to mark for deletion
+    const form = document.getElementById('packageForm');
+    const deleteInput = document.createElement('input');
+    deleteInput.type = 'hidden';
+    deleteInput.name = 'delete_galleries[]';
+    deleteInput.value = dbId;
+    form.appendChild(deleteInput);
+    // Remove from DOM
+    galleryDiv.remove();
+}
 
 // Save as draft
 function saveDraft() {

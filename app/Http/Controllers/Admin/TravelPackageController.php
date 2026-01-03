@@ -94,13 +94,16 @@ class TravelPackageController extends Controller
 
         // Handle gallery images
         if ($request->hasFile('gallery_images')) {
-            $galleryImages = [];
+            $order = 0;
             foreach ($request->file('gallery_images') as $file) {
                 if ($file && $file->isValid()) {
-                    $galleryImages[] = $file->store('packages/gallery', 'public');
+                    $imagePath = $file->store('packages/gallery', 'public');
+                    $package->galleries()->create([
+                        'image_path' => $imagePath,
+                        'order' => $order++,
+                    ]);
                 }
             }
-            $package->gallery_images = !empty($galleryImages) ? json_encode($galleryImages) : null;
         }
 
         $package->save();
@@ -168,7 +171,7 @@ class TravelPackageController extends Controller
     {
         $categories = PackageCategory::orderBy('name')->get();
         $tags = \App\Models\Tag::active()->ordered()->get()->groupBy('type');
-        $package->load(['tags', 'itineraries', 'inclusions', 'exclusions']);
+        $package->load(['tags', 'itineraries', 'inclusions', 'exclusions', 'galleries']);
         return view('admin.packages.edit', compact('package', 'categories', 'tags'));
     }
 
@@ -228,24 +231,29 @@ class TravelPackageController extends Controller
             $package->featured_image = $imagePath;
         }
 
-        // Handle gallery images
-        if ($request->hasFile('gallery_images')) {
-            // Delete old gallery images
-            if ($package->gallery_images) {
-                $oldGallery = json_decode($package->gallery_images, true);
-                if (is_array($oldGallery)) {
-                    foreach ($oldGallery as $oldImage) {
-                        Storage::disk('public')->delete($oldImage);
-                    }
+        // Handle gallery image deletions
+        if ($request->has('delete_galleries') && is_array($request->delete_galleries)) {
+            foreach ($request->delete_galleries as $galleryId) {
+                $gallery = $package->galleries()->find($galleryId);
+                if ($gallery) {
+                    Storage::disk('public')->delete($gallery->image_path);
+                    $gallery->delete();
                 }
             }
-            $galleryImages = [];
+        }
+
+        // Handle new gallery images
+        if ($request->hasFile('gallery_images')) {
+            $order = $package->galleries()->count(); // Continue from existing count
             foreach ($request->file('gallery_images') as $file) {
                 if ($file && $file->isValid()) {
-                    $galleryImages[] = $file->store('packages/gallery', 'public');
+                    $imagePath = $file->store('packages/gallery', 'public');
+                    $package->galleries()->create([
+                        'image_path' => $imagePath,
+                        'order' => $order++,
+                    ]);
                 }
             }
-            $package->gallery_images = !empty($galleryImages) ? json_encode($galleryImages) : null;
         }
 
         $package->save();
@@ -329,10 +337,12 @@ class TravelPackageController extends Controller
             }
         }
 
-        $package->delete();
+        // Delete gallery images from storage
+        foreach ($package->galleries as $gallery) {
+            Storage::disk('public')->delete($gallery->image_path);
+        }
 
-        return redirect()->route('admin.packages.index')
-            ->with('success', 'Travel package deleted successfully!');
+        $package->delete();
     }
 
     public function bulkAction(Request $request)

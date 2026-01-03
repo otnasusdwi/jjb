@@ -26,7 +26,6 @@ class TravelPackage extends Model
         'price',
         'child_price',
         'featured_image',
-        'gallery_images',
         'status',
         'meta_title',
         'meta_description',
@@ -34,7 +33,6 @@ class TravelPackage extends Model
     ];
 
     protected $casts = [
-        'gallery_images' => 'array',
         'price' => 'decimal:2',
         'child_price' => 'decimal:2',
     ];
@@ -92,6 +90,15 @@ class TravelPackage extends Model
     public function exclusions(): HasMany
     {
         return $this->hasMany(PackageExclusion::class, 'travel_package_id')
+            ->orderBy('order');
+    }
+
+    /**
+     * Get gallery images for this package
+     */
+    public function galleries(): HasMany
+    {
+        return $this->hasMany(PackageGallery::class, 'travel_package_id')
             ->orderBy('order');
     }
 
