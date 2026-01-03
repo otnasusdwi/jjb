@@ -210,6 +210,117 @@
             background: #fafafa;
         }
 
+        .timeline {
+            position: relative;
+            padding-left: 0;
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-left: 80px;
+            padding-bottom: 3rem;
+        }
+
+        .timeline-item:last-child {
+            padding-bottom: 0;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 26px;
+            top: 60px;
+            bottom: -20px;
+            width: 2px;
+            border-left: 2px dashed #4ecdc4;
+        }
+
+        .timeline-item:last-child::before {
+            display: none;
+        }
+
+        .day-number {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 54px;
+            height: 54px;
+            background: linear-gradient(135deg, #4ecdc4 0%, #44b3aa 100%);
+            color: white;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            box-shadow: 0 4px 15px rgba(78, 205, 196, 0.4);
+        }
+
+        .timeline-content h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-dark);
+            font-weight: 700;
+        }
+
+        .activity-item {
+            margin-bottom: 1.5rem;
+        }
+
+        .activity-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .activity-description {
+            color: var(--text-light);
+            line-height: 1.8;
+            margin-bottom: 0;
+            padding-left: 1.5rem;
+        }
+
+        .activity-extras {
+            margin-top: 1rem;
+        }
+
+        .activity-extras .activity-item {
+            margin-bottom: 0.75rem;
+        }
+
+        .activity-extras .activity-title {
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .timeline-description {
+            color: var(--text-light);
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+        }
+
+        .timeline-details {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .timeline-details li {
+            padding: 0.5rem 0;
+            color: var(--text-light);
+            position: relative;
+            padding-left: 1.5rem;
+        }
+
+        .timeline-details li::before {
+            content: '■';
+            position: absolute;
+            left: 0;
+            color: var(--text-dark);
+            font-size: 0.8rem;
+        }
+
         .tag-badge {
             display: inline-block;
             padding: 0.6rem 1.2rem;
@@ -218,6 +329,94 @@
             font-weight: 500;
             margin: 0.25rem;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .tab-navigation {
+            background: white;
+            border-radius: 15px;
+            padding: 0.5rem;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 1rem 1.5rem;
+            border: none;
+            background: transparent;
+            color: var(--text-light);
+            font-weight: 600;
+            font-size: 1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .tab-button:hover {
+            background: rgba(255, 140, 0, 0.1);
+            color: var(--primary-orange);
+        }
+
+        .tab-button.active {
+            background: linear-gradient(135deg, var(--primary-orange) 0%, var(--dark-orange) 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 140, 0, 0.3);
+        }
+
+        .tab-content-panel {
+            display: none;
+        }
+
+        .tab-content-panel.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .gallery-item {
+            position: relative;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .gallery-item:hover {
+            transform: scale(1.05);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .gallery-caption {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(180deg, transparent, rgba(0,0,0,0.8));
+            color: white;
+            padding: 1rem;
+            font-size: 0.9rem;
         }
         
         footer {
@@ -316,132 +515,183 @@
         <div class="container">
             <div class="row">
                 <div class="col-lg-8">
-                    <!-- Gallery Carousel -->
-                    @if($package->galleries && $package->galleries->count() > 0)
-                    <div id="packageGallery" class="carousel slide mb-5" data-bs-ride="carousel">
-                        <div class="carousel-inner">
-                            @foreach($package->galleries->sortBy('order') as $index => $gallery)
-                            <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
-                                <img src="{{ asset('storage/' . $gallery->image_path) }}" alt="{{ $gallery->caption ?? $package->name }}" class="package-image">
-                                @if($gallery->caption)
-                                <div class="carousel-caption d-none d-md-block" style="background: rgba(0,0,0,0.5); padding: 1rem; border-radius: 10px; bottom: 20px;">
-                                    <p class="mb-0">{{ $gallery->caption }}</p>
-                                </div>
-                                @endif
+                    <!-- Tab Navigation -->
+                    <div class="tab-navigation">
+                        <button class="tab-button active" onclick="switchTab('information')">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                                <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+                            </svg>
+                            INFORMATION
+                        </button>
+                        <button class="tab-button" onclick="switchTab('itinerary')">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M11 6.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1z"/>
+                                <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
+                            </svg>
+                            ITINERARY
+                        </button>
+                        <button class="tab-button" onclick="switchTab('gallery')">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
+                                <path d="M2.002 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2h-12zm12 1a1 1 0 0 1 1 1v6.5l-3.777-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12V3a1 1 0 0 1 1-1h12z"/>
+                            </svg>
+                            GALLERY
+                        </button>
+                    </div>
+
+                    <!-- Tab Content: Information -->
+                    <div id="tab-information" class="tab-content-panel active">
+                        <!-- Tags -->
+                        @if($package->tags && $package->tags->count() > 0)
+                        <div class="content-card">
+                            <h2 class="section-title">Tour Categories</h2>
+                            <div>
+                                @foreach($package->tags as $tag)
+                                <span class="tag-badge" style="background-color: {{ $tag->color ?? '#FF8C00' }}; color: white;">
+                                    {{ $tag->name }}
+                                </span>
+                                @endforeach
                             </div>
-                            @endforeach
                         </div>
-                        @if($package->galleries->count() > 1)
-                        <button class="carousel-control-prev" type="button" data-bs-target="#packageGallery" data-bs-slide="prev">
-                            <span class="carousel-control-prev-icon"></span>
-                        </button>
-                        <button class="carousel-control-next" type="button" data-bs-target="#packageGallery" data-bs-slide="next">
-                            <span class="carousel-control-next-icon"></span>
-                        </button>
+                        @endif
+                        
+                        <!-- Description -->
+                        <div class="content-card">
+                            <h2 class="section-title">About This Tour</h2>
+                            <div style="line-height: 1.8; color: var(--text-light);">{!! nl2br(e($package->description)) !!}</div>
+                        </div>
+
+                        <!-- Inclusions -->
+                        @if($package->inclusions && $package->inclusions->count() > 0)
+                        <div class="content-card">
+                            <h2 class="section-title">What's Included</h2>
+                            <div class="bg-light p-4 rounded" style="border-left: 4px solid var(--primary-orange);">
+                                @foreach($package->inclusions as $inclusion)
+                                <div class="highlight-item">
+                                    <strong>✓ {{ $inclusion->title }}</strong>
+                                    @if($inclusion->description)
+                                    <br><small class="text-muted">{{ $inclusion->description }}</small>
+                                    @endif
+                                </div>
+                                @endforeach
+                            </div>
+                        </div>
+                        @endif
+
+                        <!-- Exclusions -->
+                        @if($package->exclusions && $package->exclusions->count() > 0)
+                        <div class="content-card">
+                            <h2 class="section-title">What's Not Included</h2>
+                            <div class="bg-light p-4 rounded" style="border-left: 4px solid #dc3545;">
+                                @foreach($package->exclusions as $exclusion)
+                                <div class="highlight-item">
+                                    <strong>✗ {{ $exclusion->title }}</strong>
+                                    @if($exclusion->description)
+                                    <br><small class="text-muted">{{ $exclusion->description }}</small>
+                                    @endif
+                                </div>
+                                @endforeach
+                            </div>
+                        </div>
                         @endif
                     </div>
-                    @elseif($package->main_image_path)
-                    <img src="{{ asset('storage/' . $package->main_image_path) }}" alt="{{ $package->name }}" class="package-image mb-5">
-                    @endif
 
-                    <!-- Tags -->
-                    @if($package->tags && $package->tags->count() > 0)
-                    <div class="content-card">
-                        <h2 class="section-title">Tour Categories</h2>
-                        <div>
-                            @foreach($package->tags as $tag)
-                            <span class="tag-badge" style="background-color: {{ $tag->color ?? '#FF8C00' }}; color: white;">
-                                {{ $tag->name }}
-                            </span>
-                            @endforeach
-                        </div>
-                    </div>
-                    @endif
-                    
-                    <!-- Description -->
-                    <div class="content-card">
-                        <h2 class="section-title">About This Tour</h2>
-                        <div style="line-height: 1.8; color: var(--text-light);">{!! nl2br(e($package->description)) !!}</div>
-                    </div>
-
-                    <!-- Itinerary -->
-                    @if($package->itineraries && $package->itineraries->count() > 0)
-                    <div class="content-card">
-                        <h2 class="section-title">Day-by-Day Itinerary</h2>
-                        <div class="accordion" id="itineraryAccordion">
-                            @foreach($package->itineraries as $itinerary)
-                            <div class="accordion-item">
-                                <h2 class="accordion-header">
-                                    <button class="accordion-button {{ $loop->first ? '' : 'collapsed' }}" type="button" data-bs-toggle="collapse" data-bs-target="#itinerary{{ $itinerary->id }}" aria-expanded="{{ $loop->first ? 'true' : 'false' }}">
-                                    <strong>Day {{ $itinerary->day_number }}: {{ $itinerary->title }}</strong>
-                                    </button>
-                                </h2>
-                                <div id="itinerary{{ $itinerary->id }}" class="accordion-collapse collapse {{ $loop->first ? 'show' : '' }}" data-bs-parent="#itineraryAccordion">
-                                    <div class="accordion-body">
-                                        <p>{{ $itinerary->description }}</p>
+                    <!-- Tab Content: Itinerary -->
+                    <div id="tab-itinerary" class="tab-content-panel">
+                        @if(isset($groupedItineraries) && $groupedItineraries->count() > 0)
+                        <div class="content-card">
+                            <h2 class="section-title">Itinerary</h2>
+                            <div class="timeline">
+                                @foreach($groupedItineraries as $dayNumber => $dayItineraries)
+                                <div class="timeline-item">
+                                    <div class="day-number">{{ $dayNumber }}</div>
+                                    <div class="timeline-content">
+                                        <h3>Day {{ $dayNumber }}</h3>
                                         
-                                        @if($itinerary->meals || $itinerary->accommodation)
-                                        <div class="mt-3 pt-3 border-top">
-                                            @if($itinerary->breakfast || $itinerary->lunch || $itinerary->dinner)
-                                            <p class="mb-2">
-                                                <strong>🍽️ Meals:</strong> 
-                                                @php
-                                                    $meals = [];
-                                                    if ($itinerary->breakfast) $meals[] = 'Breakfast';
-                                                    if ($itinerary->lunch) $meals[] = 'Lunch';
-                                                    if ($itinerary->dinner) $meals[] = 'Dinner';
-                                                @endphp
-                                                {{ implode(', ', $meals) ?: 'As per schedule' }}
-                                            </p>
+                                        @foreach($dayItineraries as $itinerary)
+                                        <div class="activity-item">
+                                            <h4 class="activity-title">{{ $itinerary->title }}</h4>
+                                            @if($itinerary->description)
+                                            <p class="activity-description">{{ $itinerary->description }}</p>
                                             @endif
-                                            @if($itinerary->accommodation)
-                                            <p class="mb-0">
-                                                <strong>🏨 Accommodation:</strong> {{ $itinerary->accommodation }}
-                                            </p>
+                                        </div>
+                                        @endforeach
+
+                                        @php
+                                            // Get meals and accommodation from any itinerary in this day
+                                            $firstItinerary = $dayItineraries->first();
+                                        @endphp
+                                        @if($firstItinerary && ($firstItinerary->breakfast || $firstItinerary->lunch || $firstItinerary->dinner || $firstItinerary->accommodation))
+                                        <div class="activity-extras">
+                                            @if($firstItinerary->accommodation)
+                                            <div class="activity-item">
+                                                <h4 class="activity-title">🏨 {{ $firstItinerary->accommodation }}</h4>
+                                            </div>
+                                            @endif
+                                            @if($firstItinerary->breakfast)
+                                            <div class="activity-item">
+                                                <h4 class="activity-title">🍳 Breakfast</h4>
+                                            </div>
+                                            @endif
+                                            @if($firstItinerary->lunch)
+                                            <div class="activity-item">
+                                                <h4 class="activity-title">🍽️ Lunch</h4>
+                                            </div>
+                                            @endif
+                                            @if($firstItinerary->dinner)
+                                            <div class="activity-item">
+                                                <h4 class="activity-title">🍷 Dinner</h4>
+                                            </div>
                                             @endif
                                         </div>
                                         @endif
                                     </div>
                                 </div>
+                                @endforeach
                             </div>
-                            @endforeach
                         </div>
+                        @else
+                        <div class="content-card text-center py-5">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="text-muted mb-3" viewBox="0 0 16 16">
+                                <path d="M11 6.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1z"/>
+                                <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
+                            </svg>
+                            <h4>No Itinerary Available</h4>
+                            <p class="text-muted">Detailed itinerary will be provided upon booking.</p>
+                        </div>
+                        @endif
                     </div>
-                    @endif
 
-                    <!-- Inclusions -->
-                    @if($package->inclusions && $package->inclusions->count() > 0)
-                    <div class="content-card">
-                        <h2 class="section-title">What's Included</h2>
-                        <div class="bg-light p-4 rounded" style="border-left: 4px solid var(--primary-orange);">
-                            @foreach($package->inclusions as $inclusion)
-                            <div class="highlight-item">
-                                <strong>✓ {{ $inclusion->title }}</strong>
-                                @if($inclusion->description)
-                                <br><small class="text-muted">{{ $inclusion->description }}</small>
-                                @endif
+                    <!-- Tab Content: Gallery -->
+                    <div id="tab-gallery" class="tab-content-panel">
+                        @if($package->galleries && $package->galleries->count() > 0)
+                        <div class="content-card">
+                            <h2 class="section-title">Photo Gallery</h2>
+                            <div class="gallery-grid">
+                                @foreach($package->galleries->sortBy('order') as $gallery)
+                                <div class="gallery-item">
+                                    <img src="{{ asset('storage/' . $gallery->image_path) }}" alt="{{ $gallery->caption ?? $package->name }}">
+                                    @if($gallery->caption)
+                                    <div class="gallery-caption">
+                                        {{ $gallery->caption }}
+                                    </div>
+                                    @endif
+                                </div>
+                                @endforeach
                             </div>
-                            @endforeach
                         </div>
-                    </div>
-                    @endif
-
-                    <!-- Exclusions -->
-                    @if($package->exclusions && $package->exclusions->count() > 0)
-                    <div class="content-card">
-                        <h2 class="section-title">What's Not Included</h2>
-                        <div class="bg-light p-4 rounded" style="border-left: 4px solid #dc3545;">
-                            @foreach($package->exclusions as $exclusion)
-                            <div class="highlight-item">
-                                <strong>✗ {{ $exclusion->title }}</strong>
-                                @if($exclusion->description)
-                                <br><small class="text-muted">{{ $exclusion->description }}</small>
-                                @endif
-                            </div>
-                            @endforeach
+                        @else
+                        <div class="content-card text-center py-5">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="text-muted mb-3" viewBox="0 0 16 16">
+                                <path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
+                                <path d="M2.002 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2h-12zm12 1a1 1 0 0 1 1 1v6.5l-3.777-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12V3a1 1 0 0 1 1-1h12z"/>
+                            </svg>
+                            <h4>No Gallery Available</h4>
+                            <p class="text-muted">Photos will be added soon.</p>
                         </div>
+                        @endif
                     </div>
-                    @endif
                 </div>
 
                 <!-- Sidebar -->
@@ -496,5 +746,32 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Tab Switching Script -->
+    <script>
+        function switchTab(tabName) {
+            // Hide all tab content panels
+            document.querySelectorAll('.tab-content-panel').forEach(panel => {
+                panel.classList.remove('active');
+            });
+            
+            // Remove active class from all tab buttons
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById('tab-' + tabName).classList.add('active');
+            
+            // Add active class to clicked button
+            event.currentTarget.classList.add('active');
+            
+            // Scroll to top of content
+            window.scrollTo({
+                top: document.querySelector('.tab-navigation').offsetTop - 100,
+                behavior: 'smooth'
+            });
+        }
+    </script>
 </body>
 </html>

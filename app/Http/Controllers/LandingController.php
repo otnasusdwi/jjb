@@ -30,11 +30,16 @@ class LandingController extends Controller
 
     public function showPackage($slug)
     {
-        $package = TravelPackage::with(['tags', 'itineraries', 'inclusions', 'exclusions', 'galleries'])
+        $package = TravelPackage::with(['tags', 'itineraries' => function($query) {
+                $query->orderBy('day_number')->orderBy('order');
+            }, 'inclusions', 'exclusions', 'galleries'])
             ->where('slug', $slug)
             ->where('status', 'active')
             ->firstOrFail();
 
-        return view('landing.package', compact('package'));
+        // Group itineraries by day_number
+        $groupedItineraries = $package->itineraries->groupBy('day_number');
+
+        return view('landing.package', compact('package', 'groupedItineraries'));
     }
 }
