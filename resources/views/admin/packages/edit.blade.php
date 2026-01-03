@@ -132,11 +132,22 @@
                                 <div class="row">
                                     <div class="col-md-4">
                                         <div class="mb-3">
-                                            <label for="duration" class="form-label">Duration (Days) <span class="text-danger">*</span></label>
+                                            <label for="duration_days" class="form-label">Days <span class="text-danger">*</span></label>
                                             <input type="number" min="1" max="30"
-                                                   class="form-control @error('duration') is-invalid @enderror"
-                                                   id="duration" name="duration" value="{{ old('duration', $package->duration) }}" required>
-                                            @error('duration')
+                                                   class="form-control @error('duration_days') is-invalid @enderror"
+                                                   id="duration_days" name="duration_days" value="{{ old('duration_days', $package->duration_days) }}" required>
+                                            @error('duration_days')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label for="duration_nights" class="form-label">Nights</label>
+                                            <input type="number" min="0" max="30"
+                                                   class="form-control @error('duration_nights') is-invalid @enderror"
+                                                   id="duration_nights" name="duration_nights" value="{{ old('duration_nights', $package->duration_nights) }}">
+                                            @error('duration_nights')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
                                         </div>
@@ -148,21 +159,6 @@
                                                    class="form-control @error('max_participants') is-invalid @enderror"
                                                    id="max_participants" name="max_participants" value="{{ old('max_participants', $package->max_participants) }}">
                                             @error('max_participants')
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="mb-3">
-                                            <label for="difficulty_level" class="form-label">Difficulty Level</label>
-                                            <select class="form-select @error('difficulty_level') is-invalid @enderror"
-                                                    id="difficulty_level" name="difficulty_level">
-                                                <option value="">Select Difficulty</option>
-                                                <option value="easy" {{ old('difficulty_level', $package->difficulty_level) === 'easy' ? 'selected' : '' }}>Easy</option>
-                                                <option value="moderate" {{ old('difficulty_level', $package->difficulty_level) === 'moderate' ? 'selected' : '' }}>Moderate</option>
-                                                <option value="challenging" {{ old('difficulty_level', $package->difficulty_level) === 'challenging' ? 'selected' : '' }}>Challenging</option>
-                                            </select>
-                                            @error('difficulty_level')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
                                         </div>

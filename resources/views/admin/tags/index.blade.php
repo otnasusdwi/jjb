@@ -71,16 +71,13 @@
                                 @foreach($tags as $tag)
                                 <tr>
                                     <td>
-                                        <div class="d-flex align-items-center">
-                                            <span style="font-size: 1.5rem; margin-right: 10px;">{{ $tag->icon }}</span>
-                                            <div>
-                                                <h6 class="mb-0">{{ $tag->name }}</h6>
-                                                <small class="text-muted">{{ Str::limit($tag->description, 50) }}</small>
-                                                <br>
-                                                <span class="badge badge-sm mt-1" style="background-color: {{ $tag->color }}">
-                                                    {{ $tag->color }}
-                                                </span>
-                                            </div>
+                                        <div>
+                                            <h6 class="mb-0">{{ $tag->name }}</h6>
+                                            <small class="text-muted">{{ Str::limit($tag->description, 50) }}</small>
+                                            <br>
+                                            <span class="badge badge-sm mt-1" style="background-color: {{ $tag->color }}">
+                                                {{ $tag->color }}
+                                            </span>
                                         </div>
                                     </td>
                                     <td>

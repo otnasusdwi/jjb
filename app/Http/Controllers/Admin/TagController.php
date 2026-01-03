@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Tag;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class TagController extends Controller
 {
@@ -44,21 +45,36 @@ class TagController extends Controller
             'name' => 'required|string|max:255|unique:tags,name',
             'type' => 'required|in:destination,activity,theme,duration',
             'color' => 'nullable|string|max:7',
-            'icon' => 'nullable|string|max:10',
             'description' => 'nullable|string|max:500',
             'sort_order' => 'nullable|integer|min:0',
             'is_active' => 'boolean',
+            'gallery_images.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'gallery_captions.*' => 'nullable|string|max:255',
         ]);
 
-        Tag::create([
+        $tag = Tag::create([
             'name' => $request->name,
             'type' => $request->type,
             'color' => $request->color ?? '#FF8C00',
-            'icon' => $request->icon,
             'description' => $request->description,
             'sort_order' => $request->sort_order ?? 0,
             'is_active' => $request->has('is_active'),
         ]);
+
+        // Handle gallery images for destination type only
+        if ($request->type === 'destination' && $request->hasFile('gallery_images')) {
+            $order = 0;
+            foreach ($request->file('gallery_images') as $index => $file) {
+                if ($file && $file->isValid()) {
+                    $imagePath = $file->store('tags/gallery', 'public');
+                    $tag->galleries()->create([
+                        'image_path' => $imagePath,
+                        'caption' => $request->gallery_captions[$index] ?? null,
+                        'order' => $order++,
+                    ]);
+                }
+            }
+        }
 
         return redirect()->route('admin.tags.index')
             ->with('success', 'Tag created successfully!');
@@ -84,6 +100,7 @@ class TagController extends Controller
      */
     public function edit(Tag $tag)
     {
+        $tag->load('galleries');
         return view('admin.tags.edit', compact('tag'));
     }
 
@@ -96,21 +113,47 @@ class TagController extends Controller
             'name' => 'required|string|max:255|unique:tags,name,' . $tag->id,
             'type' => 'required|in:destination,activity,theme,duration',
             'color' => 'nullable|string|max:7',
-            'icon' => 'nullable|string|max:10',
             'description' => 'nullable|string|max:500',
             'sort_order' => 'nullable|integer|min:0',
             'is_active' => 'boolean',
+            'gallery_images.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'gallery_captions.*' => 'nullable|string|max:255',
         ]);
 
         $tag->update([
             'name' => $request->name,
             'type' => $request->type,
             'color' => $request->color ?? '#FF8C00',
-            'icon' => $request->icon,
             'description' => $request->description,
             'sort_order' => $request->sort_order ?? 0,
             'is_active' => $request->has('is_active'),
         ]);
+
+        // Handle gallery deletions for destination type
+        if ($request->type === 'destination' && $request->has('delete_galleries') && is_array($request->delete_galleries)) {
+            foreach ($request->delete_galleries as $galleryId) {
+                $gallery = $tag->galleries()->find($galleryId);
+                if ($gallery) {
+                    Storage::disk('public')->delete($gallery->image_path);
+                    $gallery->delete();
+                }
+            }
+        }
+
+        // Handle new gallery images for destination type only
+        if ($request->type === 'destination' && $request->hasFile('gallery_images')) {
+            $order = $tag->galleries()->count();
+            foreach ($request->file('gallery_images') as $index => $file) {
+                if ($file && $file->isValid()) {
+                    $imagePath = $file->store('tags/gallery', 'public');
+                    $tag->galleries()->create([
+                        'image_path' => $imagePath,
+                        'caption' => $request->gallery_captions[$index] ?? null,
+                        'order' => $order++,
+                    ]);
+                }
+            }
+        }
 
         return redirect()->route('admin.tags.index')
             ->with('success', 'Tag updated successfully!');
@@ -125,6 +168,11 @@ class TagController extends Controller
         if ($tag->packages()->count() > 0) {
             return redirect()->route('admin.tags.index')
                 ->with('error', 'Cannot delete tag that is assigned to packages. Please remove it from packages first.');
+        }
+
+        // Delete gallery images from storage
+        foreach ($tag->galleries as $gallery) {
+            Storage::disk('public')->delete($gallery->image_path);
         }
 
         $tag->delete();

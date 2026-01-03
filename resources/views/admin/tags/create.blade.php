@@ -23,7 +23,7 @@
                 <h5 class="card-title mb-0">Tag Information</h5>
             </div>
             <div class="card-body">
-                <form action="{{ route('admin.tags.store') }}" method="POST">
+                <form action="{{ route('admin.tags.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
 
                     <div class="mb-3">
@@ -88,21 +88,7 @@
                                 <small class="text-muted">Choose a color for this tag badge</small>
                             </div>
                         </div>
-                        <div class="col-md-4">
-                            <div class="mb-3">
-                                <label for="icon" class="form-label">Icon Emoji</label>
-                                <input type="text" 
-                                       class="form-control @error('icon') is-invalid @enderror" 
-                                       id="icon" 
-                                       name="icon" 
-                                       value="{{ old('icon') }}"
-                                       placeholder="🏝️">
-                                @error('icon')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                                <small class="text-muted">Optional emoji</small>
-                            </div>
-                        </div>
+
                     </div>
 
                     <div class="mb-3">
@@ -152,7 +138,20 @@
                         </div>
                     </div>
 
-                    <div class="d-flex justify-content-between">
+                    <!-- Gallery Section (Only for Destination Type) -->
+                    <div id="gallerySection" style="display: none;">
+                        <hr class="my-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h6 class="mb-0">Gallery Images</h6>
+                            <button type="button" class="btn btn-sm btn-primary" onclick="addGalleryImage()">
+                                <i class="ri-add-line"></i> Add Image
+                            </button>
+                        </div>
+                        <div id="gallery-container"></div>
+                        <small class="text-muted">Add photos to showcase this destination. Recommended: 1200x800px, Max 2MB per image</small>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
                         <a href="{{ route('admin.tags.index') }}" class="btn btn-secondary">
                             <i class="ri-arrow-left-line me-1"></i> Back
                         </a>
@@ -173,7 +172,6 @@
             <div class="card-body">
                 <div id="tagPreview" class="text-center p-4">
                     <span class="badge" style="font-size: 1.2rem; padding: 0.6rem 1.2rem; background-color: #FF8C00;">
-                        <span id="previewIcon"></span>
                         <span id="previewName">Tag Preview</span>
                     </span>
                     <p class="text-muted mt-3 mb-0" id="previewDescription">
@@ -230,18 +228,84 @@ function updatePreview() {
     const color = document.getElementById('color').value;
     const description = document.getElementById('description').value || 'Enter tag details to see preview';
     
-    document.getElementById('previewName').textContent = name;
-    document.getElementById('previewIcon').textContent = icon ? icon + ' ' : '';
-    document.getElementById('previewDescription').textContent = description;
-    document.querySelector('#tagPreview .badge').style.backgroundColor = color;
+
+// Show/hide gallery section based on tag type
+const typeSelect = document.getElementById('type');
+const gallerySection = document.getElementById('gallerySection');
+
+typeSelect.addEventListener('change', function() {
+    if (this.value === 'destination') {
+        gallerySection.style.display = 'block';
+    } else {
+        gallerySection.style.display = 'none';
+    }
+});
+
+// Gallery management
+let galleryCounter = 0;
+
+function addGalleryImage() {
+    galleryCounter++;
+    const container = document.getElementById('gallery-container');
+    const imageHtml = `
+        <div class="border rounded p-3 mb-3" id="gallery-${galleryCounter}">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6 class="mb-0">Image ${galleryCounter}</h6>
+                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeGalleryImage(${galleryCounter})">
+                    <i class="ri-delete-bin-line"></i>
+                </button>
+            </div>
+            <div class="mb-2">
+                <label class="form-label">Image File</label>
+                <input type="file" class="form-control form-control-sm" 
+                       name="gallery_images[]" 
+                       accept="image/*"
+                       onchange="previewGalleryImage(event, ${galleryCounter})">
+            </div>
+            <div class="mb-2">
+                <label class="form-label">Caption (Optional)</label>
+                <input type="text" class="form-control form-control-sm" 
+                       name="gallery_captions[]" 
+                       placeholder="e.g., Beautiful sunset at Tanah Lot">
+            </div>
+            <div class="image-preview" id="gallery-preview-${galleryCounter}" style="min-height: 150px; border: 2px dashed #ddd; display: none; align-items: center; justify-content: center;">
+                <img id="gallery-img-${galleryCounter}" src="#" alt="Preview" style="max-width: 100%; max-height: 150px;">
+            </div>
+        </div>
+    `;
+    container.insertAdjacentHTML('beforeend', imageHtml);
 }
 
-// Update preview on input
-document.getElementById('name').addEventListener('input', updatePreview);
-document.getElementById('icon').addEventListener('input', updatePreview);
-document.getElementById('description').addEventListener('input', updatePreview);
+function removeGalleryImage(imageId) {
+    document.getElementById('gallery-' + imageId).remove();
+}
 
-// Initial preview
-updatePreview();
+function previewGalleryImage(event, imageId) {
+    const file = event.target.files[0];
+    const preview = document.getElementById('gallery-preview-' + imageId);
+    const img = document.getElementById('gallery-img-' + imageId);
+
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            img.src = e.target.result;
+            preview.style.display = 'flex';
+        };
+        reader.readAsDataURL(file);
+    }
+}
+    function updatePreview() {
+        const name = document.getElementById('name').value || 'Tag Preview';
+        const color = document.getElementById('color').value || '#FF8C00';
+        const description = document.getElementById('description').value || 'Enter tag details to see preview';
+        
+        document.getElementById('previewName').textContent = name;
+        document.getElementById('previewDescription').textContent = description;
+        document.querySelector('#tagPreview .badge').style.backgroundColor = color;
+    }
+
+    // Update preview on input
+    document.getElementById('name').addEventListener('input', updatePreview);
+    document.getElementById('description').addEventListener('input', updatePreview);
 </script>
 @endpush

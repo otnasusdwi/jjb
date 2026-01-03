@@ -133,7 +133,7 @@
                             Tags
                         </a>
                     </li>
-                    <li class="nav-item">
+                    {{-- <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('admin.bookings.*') ? 'active' : '' }}"
                            href="{{ route('admin.bookings.index') }}">
                             <i class="ri-calendar-line me-2"></i>
@@ -170,7 +170,7 @@
                             <i class="ri-settings-line me-2"></i>
                             Settings
                         </a>
-                    </li>
+                    </li> --}}
                 </ul>
             </div>
         </nav>

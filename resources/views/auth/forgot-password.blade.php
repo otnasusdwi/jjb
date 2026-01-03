@@ -4,7 +4,7 @@
     <!-- Auth Header -->
     <div class="auth-header">
         <div class="auth-logo">
-            <i class="fas fa-key fa-2x text-white"></i>
+            <img src="{{ asset('jjb.png') }}" alt="JJB Travel Bali" style="width: 60px; height: 60px; object-fit: contain;">
         </div>
         <h4 class="mb-0 fw-bold">Forgot Password?</h4>
         <p class="mb-0 opacity-75">No problem! We'll send you a reset link</p>

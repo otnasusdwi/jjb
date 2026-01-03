@@ -35,9 +35,6 @@
             <div class="card-body">
                 <div class="text-center mb-4">
                     <span class="badge" style="font-size: 1.5rem; padding: 0.8rem 1.5rem; background-color: {{ $tag->color }};">
-                        @if($tag->icon)
-                            <span style="margin-right: 8px;">{{ $tag->icon }}</span>
-                        @endif
                         {{ $tag->name }}
                     </span>
                 </div>

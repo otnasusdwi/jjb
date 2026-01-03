@@ -4,7 +4,7 @@
     <!-- Auth Header -->
     <div class="auth-header">
         <div class="auth-logo">
-            <i class="fas fa-plane fa-2x text-white"></i>
+            <img src="{{ asset('jjb.png') }}" alt="JJB Travel Bali" style="width: 60px; height: 60px; object-fit: contain;">
         </div>
         <h4 class="mb-0 fw-bold">Welcome Back!</h4>
         <p class="mb-0 opacity-75">Sign in to your JJB Travel Bali account</p>

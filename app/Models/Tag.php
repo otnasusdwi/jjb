@@ -16,7 +16,6 @@ class Tag extends Model
         'slug',
         'type',
         'color',
-        'icon',
         'description',
         'sort_order',
         'is_active',
@@ -54,6 +53,14 @@ class Tag extends Model
     {
         return $this->belongsToMany(TravelPackage::class, 'package_tag', 'tag_id', 'travel_package_id')
             ->withTimestamps();
+    }
+
+    /**
+     * Get gallery images for this tag
+     */
+    public function galleries()
+    {
+        return $this->hasMany(TagGallery::class)->orderBy('order');
     }
 
     /**

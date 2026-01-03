@@ -46,9 +46,9 @@ class TravelPackageController extends Controller
             'category' => 'nullable|string|max:100',
             'description' => 'required|string',
             'location' => 'required|string|max:255',
-            'duration' => 'required|integer|min:1|max:30',
+            'duration_days' => 'required|integer|min:1|max:30',
+            'duration_nights' => 'nullable|integer|min:0|max:30',
             'max_participants' => 'nullable|integer|min:1|max:100',
-            'difficulty_level' => 'nullable|in:easy,moderate,challenging',
             'currency' => 'required|in:IDR,USD',
             'price' => 'required|numeric|min:0',
             'child_price' => 'nullable|numeric|min:0',
@@ -73,9 +73,9 @@ class TravelPackageController extends Controller
         $package->category = $request->category;
         $package->description = $request->description;
         $package->location = $request->location;
-        $package->duration = $request->duration;
+        $package->duration_days = $request->duration_days;
+        $package->duration_nights = $request->duration_nights;
         $package->max_participants = $request->max_participants;
-        $package->difficulty_level = $request->difficulty_level;
         $package->currency = $request->currency;
         $package->price = $request->price;
         $package->child_price = $request->child_price;
@@ -182,9 +182,9 @@ class TravelPackageController extends Controller
             'category' => 'nullable|string|max:100',
             'description' => 'required|string',
             'location' => 'required|string|max:255',
-            'duration' => 'required|integer|min:1|max:30',
+            'duration_days' => 'required|integer|min:1|max:30',
+            'duration_nights' => 'nullable|integer|min:0|max:30',
             'max_participants' => 'nullable|integer|min:1|max:100',
-            'difficulty_level' => 'nullable|in:easy,moderate,challenging',
             'currency' => 'required|in:IDR,USD',
             'price' => 'required|numeric|min:0',
             'child_price' => 'nullable|numeric|min:0',
@@ -208,9 +208,9 @@ class TravelPackageController extends Controller
         $package->category = $request->category;
         $package->description = $request->description;
         $package->location = $request->location;
-        $package->duration = $request->duration;
+        $package->duration_days = $request->duration_days;
+        $package->duration_nights = $request->duration_nights;
         $package->max_participants = $request->max_participants;
-        $package->difficulty_level = $request->difficulty_level;
         $package->currency = $request->currency;
         $package->price = $request->price;
         $package->child_price = $request->child_price;
@@ -343,6 +343,9 @@ class TravelPackageController extends Controller
         }
 
         $package->delete();
+
+        return redirect()->route('admin.packages.index')
+            ->with('success', 'Travel package deleted successfully.');
     }
 
     public function bulkAction(Request $request)

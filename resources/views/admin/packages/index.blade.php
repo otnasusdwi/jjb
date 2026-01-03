@@ -73,8 +73,8 @@
                                 <tr>
                                     <td>
                                         <div class="d-flex align-items-center">
-                                            @if($package->main_image)
-                                                <img src="{{ Storage::url($package->main_image) }}"
+                                            {{-- @if($package->featured_image)
+                                                <img src="{{ Storage::url($package->featured_image) }}"
                                                      alt="{{ $package->name }}"
                                                      class="rounded me-3" style="width: 50px; height: 50px; object-fit: cover;">
                                             @else
@@ -82,15 +82,15 @@
                                                      style="width: 50px; height: 50px;">
                                                     <i class="ri-image-line text-muted"></i>
                                                 </div>
-                                            @endif
+                                            @endif --}}
                                             <div>
                                                 <h6 class="mb-0">{{ $package->name }}</h6>
-                                                <small class="text-muted">{{ Str::limit($package->short_description, 50) }}</small>
+                                                <small class="text-muted">{{ Str::limit($package->description, 50) }}</small>
                                                 @if($package->tags && $package->tags->count() > 0)
                                                 <div class="mt-1">
                                                     @foreach($package->tags->take(3) as $tag)
                                                         <span class="badge badge-sm" style="background-color: {{ $tag->color }}; font-size: 0.7rem;">
-                                                            {{ $tag->icon }} {{ $tag->name }}
+                                                            {{ $tag->name }}
                                                         </span>
                                                     @endforeach
                                                     @if($package->tags->count() > 3)
@@ -102,19 +102,19 @@
                                         </div>
                                     </td>
                                     <td>
-                                        {{-- @if($package->category)
-                                            <span class="badge bg-info">{{ $package->category->name }}</span>
+                                        @if($package->category)
+                                            <span class="badge bg-info">{{ ucfirst($package->category) }}</span>
                                         @else
                                             <span class="text-muted">No Category</span>
-                                        @endif --}}
+                                        @endif
                                     </td>
                                     <td>
                                         {{ $package->duration_days }}D {{ $package->duration_nights }}N
                                     </td>
                                     <td>
-                                        <strong>IDR {{ number_format($package->adult_price, 0, ',', '.') }}</strong>
+                                        <strong>{{ $package->currency }} {{ number_format($package->price, 0, ',', '.') }}</strong>
                                         @if($package->child_price)
-                                            <br><small class="text-muted">Child: IDR {{ number_format($package->child_price, 0, ',', '.') }}</small>
+                                            <br><small class="text-muted">Child: {{ $package->currency }} {{ number_format($package->child_price, 0, ',', '.') }}</small>
                                         @endif
                                     </td>
                                     <td>
@@ -143,8 +143,8 @@
                                                class="btn btn-sm btn-outline-warning">
                                                 <i class="ri-edit-line"></i>
                                             </a>
-                                            <button type="button" class="btn btn-sm btn-outline-danger"
-                                                    onclick="deletePackage({{ $package->id }})">
+                                                <button type="button" class="btn btn-sm btn-outline-danger"
+                                                    onclick="deletePackage('{{ route('admin.packages.destroy', $package) }}')">
                                                 <i class="ri-delete-bin-line"></i>
                                             </button>
                                         </div>
@@ -204,10 +204,10 @@
 
 @push('scripts')
 <script>
-function deletePackage(packageId) {
+function deletePackage(deleteUrl) {
     const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
     const form = document.getElementById('deleteForm');
-    form.action = `/admin/packages/${packageId}`;
+    form.action = deleteUrl;
     modal.show();
 }
 </script>

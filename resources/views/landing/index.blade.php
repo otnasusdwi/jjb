@@ -527,7 +527,7 @@
                             @if($package->tags->count() > 0)
                             <div class="mb-3">
                                 @foreach($package->tags->take(3) as $tag)
-                                <span class="badge" style="background-color: {{ $tag->color }}; font-size: 0.7rem;">{{ $tag->icon }} {{ $tag->name }}</span>
+                                <span class="badge" style="background-color: {{ $tag->color }}; font-size: 0.7rem;">{{ $tag->name }}</span>
                                 @endforeach
                             </div>
                             @endif

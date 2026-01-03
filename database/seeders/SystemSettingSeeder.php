@@ -45,6 +45,12 @@ class SystemSettingSeeder extends Seeder
                 'description' => 'Company address',
             ],
             [
+                'key' => 'company_logo',
+                'value' => 'jjb.png',
+                'type' => 'string',
+                'description' => 'Company logo path (located in public folder)',
+            ],
+            [
                 'key' => 'default_commission_rate',
                 'value' => '10.00',
                 'type' => 'string',
