@@ -498,8 +498,32 @@
 </div>
 @endsection
 
+@push('styles')
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+<style>
+.select2-container .select2-selection--multiple {
+    min-height: 120px !important;
+}
+.select2-container--bootstrap-5 .select2-selection {
+    border-color: #dee2e6;
+}
+</style>
+@endpush
+
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
+// Initialize Select2 for tags
+$(document).ready(function() {
+    $('#tags').select2({
+        theme: 'bootstrap-5',
+        placeholder: 'Select tags for this package',
+        allowClear: true,
+        width: '100%'
+    });
+});
+
 // Save as draft
 function saveDraft() {
     document.getElementById('status').value = 'draft';
