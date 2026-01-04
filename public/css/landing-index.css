@@ -116,7 +116,6 @@
 
 /* Experience Cards */
 .experience-card {
-    background: linear-gradient(135deg, var(--primary-orange) 0%, var(--dark-orange) 100%);
     border-radius: 15px;
     padding: 0;
     text-align: center;
@@ -127,35 +126,49 @@
     min-height: 400px;
     display: flex;
     flex-direction: column;
-    justify-content: flex-end;
+    align-items: center;
+    justify-content: center;
     position: relative;
     overflow: hidden;
+    background-size: cover;
+    background-position: center;
 }
 
 .experience-card-gallery {
     width: 100%;
-    height: 300px;
+    height: 100%;
     position: absolute;
     top: 0;
     left: 0;
     z-index: 0;
+    border-radius: 15px;
 }
 
 .experience-card-gallery .carousel-item img {
-    height: 300px;
+    height: 100%;
     object-fit: cover;
+    transition: transform 0.5s ease;
 }
 
 .experience-card-content {
     position: relative;
     z-index: 1;
-    padding: 2rem 1.5rem;
-    background: transparent;
+    padding: 2.5rem 2rem;
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    max-width: 85%;
+    width: 100%;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
 }
 
 .experience-card:hover {
     transform: translateY(-10px);
-    box-shadow: 0 15px 40px rgba(255, 140, 0, 0.4);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+}
+
+.experience-card:hover .experience-card-gallery .carousel-item img {
+    transform: scale(1.05);
 }
 
 .experience-card.active {
@@ -184,23 +197,32 @@
 .experience-card h3 {
     font-size: 2rem;
     font-weight: 700;
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
+}
+
+.experience-card-content p {
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.6);
 }
 
 .experience-card .btn {
-    margin-top: 1rem;
-    background: white;
-    color: var(--primary-orange);
+    margin-top: 1.5rem;
+    background: var(--primary-orange);
+    color: white;
     border: none;
-    padding: 10px 30px;
+    padding: 10px 35px;
     font-weight: 600;
     border-radius: 25px;
     cursor: pointer;
     display: inline-block;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(255, 140, 0, 0.3);
 }
 
 .experience-card .btn:hover {
-    background: #f8f9fa;
+    background: var(--primary-orange);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 140, 0, 0.5);
 }
 
 /* Package Cards */
@@ -454,6 +476,85 @@ section {
     display: none;
 }
 
+.experience-card-gallery .carousel-control-prev,
+.experience-card-gallery .carousel-control-next {
+    display: none !important;
+}
 .no-results.show {
     display: block;
+}
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .section-title {
+        font-size: 1.8rem;
+        margin-bottom: 2rem;
+        width: 100%;
+    }
+
+    #packages {
+        padding: 40px 15px !important;
+    }
+
+    .d-flex.justify-content-between.align-items-center {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 1.5rem;
+    }
+
+    .d-flex.justify-content-between.align-items-center > div:first-child {
+        margin-bottom: 0;
+        width: 100%;
+    }
+
+    .d-flex.justify-content-between.align-items-center > div:last-child {
+        width: 100%;
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 1rem !important;
+    }
+
+    #tagFilter {
+        width: 100% !important;
+    }
+
+    .filter-controls {
+        width: 100%;
+        flex-direction: column !important;
+        gap: 1rem !important;
+    }
+
+    .filter-badge {
+        width: 100%;
+        text-align: center;
+    }
+
+    .clear-filter {
+        margin-left: 0;
+        text-align: center;
+        display: block;
+    }
+}
+
+@media (max-width: 576px) {
+    .section-title {
+        font-size: 1.5rem;
+    }
+
+    .section-title::after {
+        width: 60px;
+    }
+
+    #packages {
+        padding: 30px 10px !important;
+    }
+
+    #tagFilter {
+        font-size: 0.9rem;
+        padding: 0.5rem;
+    }
+
+    .filter-badge {
+        padding: 8px 20px;
+        font-size: 0.9rem;
+    }
 }
