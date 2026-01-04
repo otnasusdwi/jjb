@@ -79,6 +79,7 @@ Route::prefix('admin')->middleware(['auth', 'role:admin,super_admin'])->name('ad
         Route::put('/{tag}', [TagController::class, 'update'])->name('update');
         Route::delete('/{tag}', [TagController::class, 'destroy'])->name('destroy');
         Route::post('/{tag}/toggle-status', [TagController::class, 'toggleStatus'])->name('toggle-status');
+        Route::delete('/{tag}/gallery/{galleryId}', [TagController::class, 'deleteGallery'])->name('delete-gallery');
     });
 
     // Bookings

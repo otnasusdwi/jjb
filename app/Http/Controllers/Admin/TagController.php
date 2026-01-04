@@ -41,16 +41,26 @@ class TagController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255|unique:tags,name',
-            'type' => 'required|in:destination,activity,theme,duration',
-            'color' => 'nullable|string|max:7',
-            'description' => 'nullable|string|max:500',
-            'sort_order' => 'nullable|integer|min:0',
-            'is_active' => 'boolean',
-            'gallery_images.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            'gallery_captions.*' => 'nullable|string|max:255',
-        ]);
+        // Check if request was truncated (file size too large)
+        if ($request->server('CONTENT_LENGTH') > (int) ini_get('post_max_size') * 1024 * 1024) {
+            return back()->withInput()
+                ->with('error', 'Upload failed: Total file size exceeds server limit. Please reduce file sizes or upload fewer images.');
+        }
+
+        try {
+            $request->validate([
+                'name' => 'required|string|max:255|unique:tags,name',
+                'type' => 'required|in:destination,activity,theme,duration',
+                'color' => 'nullable|string|max:7',
+                'description' => 'nullable|string|max:500',
+                'sort_order' => 'nullable|integer|min:0',
+                'is_active' => 'boolean',
+                'gallery_images.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+                'gallery_captions.*' => 'nullable|string|max:255',
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return back()->withInput()->withErrors($e->errors());
+        }
 
         $tag = Tag::create([
             'name' => $request->name,
@@ -64,15 +74,46 @@ class TagController extends Controller
         // Handle gallery images for destination type only
         if ($request->type === 'destination' && $request->hasFile('gallery_images')) {
             $order = 0;
-            foreach ($request->file('gallery_images') as $index => $file) {
+            $files = $request->file('gallery_images');
+            $captions = $request->input('gallery_captions', []);
+            
+            $uploadedCount = 0;
+            $failedFiles = [];
+            
+            foreach ($files as $index => $file) {
                 if ($file && $file->isValid()) {
-                    $imagePath = $file->store('tags/gallery', 'public');
-                    $tag->galleries()->create([
-                        'image_path' => $imagePath,
-                        'caption' => $request->gallery_captions[$index] ?? null,
-                        'order' => $order++,
-                    ]);
+                    try {
+                        // Validate individual file size
+                        if ($file->getSize() > 2048 * 1024) {
+                            $failedFiles[] = $file->getClientOriginalName() . ' (exceeds 2MB)';
+                            continue;
+                        }
+                        
+                        $imagePath = $file->store('tags/gallery', 'public');
+                        $tag->galleries()->create([
+                            'image_path' => $imagePath,
+                            'caption' => $captions[$index] ?? null,
+                            'order' => $order++,
+                        ]);
+                        $uploadedCount++;
+                    } catch (\Exception $e) {
+                        \Log::error('Failed to upload gallery image: ' . $e->getMessage());
+                        $failedFiles[] = $file->getClientOriginalName();
+                        continue;
+                    }
                 }
+            }
+            
+            if ($uploadedCount > 0) {
+                $message = "Tag created successfully with {$uploadedCount} gallery images!";
+                if (count($failedFiles) > 0) {
+                    $message .= " Failed to upload: " . implode(', ', $failedFiles);
+                }
+                return redirect()->route('admin.tags.index')
+                    ->with('success', $message);
+            } elseif (count($failedFiles) > 0) {
+                return redirect()->route('admin.tags.index')
+                    ->with('error', 'Tag created but gallery upload failed: ' . implode(', ', $failedFiles));
             }
         }
 
@@ -109,16 +150,27 @@ class TagController extends Controller
      */
     public function update(Request $request, Tag $tag)
     {
-        $request->validate([
-            'name' => 'required|string|max:255|unique:tags,name,' . $tag->id,
-            'type' => 'required|in:destination,activity,theme,duration',
-            'color' => 'nullable|string|max:7',
-            'description' => 'nullable|string|max:500',
-            'sort_order' => 'nullable|integer|min:0',
-            'is_active' => 'boolean',
-            'gallery_images.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            'gallery_captions.*' => 'nullable|string|max:255',
-        ]);
+        // Check if request was truncated (file size too large)
+        if ($request->server('CONTENT_LENGTH') > (int) ini_get('post_max_size') * 1024 * 1024) {
+            return back()->withInput()
+                ->with('error', 'Upload failed: Total file size exceeds server limit. Please reduce file sizes or upload fewer images.');
+        }
+
+        try {
+            $request->validate([
+                'name' => 'required|string|max:255|unique:tags,name,' . $tag->id,
+                'type' => 'required|in:destination,activity,theme,duration',
+                'color' => 'nullable|string|max:7',
+                'description' => 'nullable|string|max:500',
+                'sort_order' => 'nullable|integer|min:0',
+                'is_active' => 'boolean',
+                'gallery_images.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+                'gallery_captions.*' => 'nullable|string|max:255',
+                'existing_gallery_captions.*' => 'nullable|string|max:255',
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return back()->withInput()->withErrors($e->errors());
+        }
 
         $tag->update([
             'name' => $request->name,
@@ -128,6 +180,16 @@ class TagController extends Controller
             'sort_order' => $request->sort_order ?? 0,
             'is_active' => $request->has('is_active'),
         ]);
+
+        // Handle gallery caption updates for existing galleries
+        if ($request->type === 'destination' && $request->has('existing_gallery_captions')) {
+            foreach ($request->existing_gallery_captions as $galleryId => $caption) {
+                $gallery = $tag->galleries()->find($galleryId);
+                if ($gallery) {
+                    $gallery->update(['caption' => $caption]);
+                }
+            }
+        }
 
         // Handle gallery deletions for destination type
         if ($request->type === 'destination' && $request->has('delete_galleries') && is_array($request->delete_galleries)) {
@@ -143,15 +205,46 @@ class TagController extends Controller
         // Handle new gallery images for destination type only
         if ($request->type === 'destination' && $request->hasFile('gallery_images')) {
             $order = $tag->galleries()->count();
-            foreach ($request->file('gallery_images') as $index => $file) {
+            $files = $request->file('gallery_images');
+            $captions = $request->input('gallery_captions', []);
+            
+            $uploadedCount = 0;
+            $failedFiles = [];
+            
+            foreach ($files as $index => $file) {
                 if ($file && $file->isValid()) {
-                    $imagePath = $file->store('tags/gallery', 'public');
-                    $tag->galleries()->create([
-                        'image_path' => $imagePath,
-                        'caption' => $request->gallery_captions[$index] ?? null,
-                        'order' => $order++,
-                    ]);
+                    try {
+                        // Validate individual file size
+                        if ($file->getSize() > 2048 * 1024) {
+                            $failedFiles[] = $file->getClientOriginalName() . ' (exceeds 2MB)';
+                            continue;
+                        }
+                        
+                        $imagePath = $file->store('tags/gallery', 'public');
+                        $tag->galleries()->create([
+                            'image_path' => $imagePath,
+                            'caption' => $captions[$index] ?? null,
+                            'order' => $order++,
+                        ]);
+                        $uploadedCount++;
+                    } catch (\Exception $e) {
+                        \Log::error('Failed to upload gallery image: ' . $e->getMessage());
+                        $failedFiles[] = $file->getClientOriginalName();
+                        continue;
+                    }
                 }
+            }
+            
+            if ($uploadedCount > 0) {
+                $message = "Tag updated successfully with {$uploadedCount} new gallery images!";
+                if (count($failedFiles) > 0) {
+                    $message .= " Failed to upload: " . implode(', ', $failedFiles);
+                }
+                return redirect()->route('admin.tags.index')
+                    ->with('success', $message);
+            } elseif (count($failedFiles) > 0) {
+                return redirect()->route('admin.tags.index')
+                    ->with('error', 'Tag updated but some gallery uploads failed: ' . implode(', ', $failedFiles));
             }
         }
 
@@ -190,5 +283,25 @@ class TagController extends Controller
 
         return redirect()->route('admin.tags.index')
             ->with('success', 'Tag status updated successfully!');
+    }
+
+    /**
+     * Delete a gallery image via AJAX
+     */
+    public function deleteGallery(Tag $tag, $galleryId)
+    {
+        $gallery = $tag->galleries()->find($galleryId);
+        
+        if (!$gallery) {
+            return response()->json(['success' => false, 'message' => 'Gallery not found'], 404);
+        }
+
+        // Delete file from storage
+        Storage::disk('public')->delete($gallery->image_path);
+        
+        // Delete from database
+        $gallery->delete();
+
+        return response()->json(['success' => true, 'message' => 'Image deleted successfully']);
     }
 }

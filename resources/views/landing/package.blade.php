@@ -1,469 +1,46 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $package->name }} - JJB Travel Services</title>
+@extends('layouts.landing')
+
+@section('head')
+    <!-- SEO Meta Tags -->
+    <title>{{ $package->seo_title ?? $package->name }} - JJB Travel Services</title>
+    <meta name="description" content="{{ $package->seo_description ?? $package->short_description ?? substr(strip_tags($package->description), 0, 160) }}">
+    <meta name="keywords" content="{{ $package->seo_keywords ?? '' }}">
+    <meta name="author" content="JJB Travel Services">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="{{ route('package.show', $package->slug) }}">
     
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Open Graph Meta Tags (Social Media) -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="{{ $package->seo_title ?? $package->name }}">
+    <meta property="og:description" content="{{ $package->seo_description ?? $package->short_description ?? substr(strip_tags($package->description), 0, 160) }}">
+    <meta property="og:url" content="{{ route('package.show', $package->slug) }}">
+    @if($package->featured_image)
+    <meta property="og:image" content="{{ asset('storage/' . $package->featured_image) }}">
+    <meta property="og:image:type" content="image/jpeg">
+    @endif
     
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ $package->seo_title ?? $package->name }}">
+    <meta name="twitter:description" content="{{ $package->seo_description ?? $package->short_description ?? substr(strip_tags($package->description), 0, 160) }}">
+    @if($package->featured_image)
+    <meta name="twitter:image" content="{{ asset('storage/' . $package->featured_image) }}">
+    @endif
     
-    <style>
-        :root {
-            --primary-orange: #FF8C00;
-            --dark-orange: #E67E00;
-            --text-dark: #2C2C2C;
-            --text-light: #666;
-        }
-        
-        body {
-            font-family: 'Poppins', sans-serif;
-            color: var(--text-dark);
-        }
-        
-        h1, h2, h3, h4, h5, h6 {
-            font-family: 'Playfair Display', serif;
-        }
-        
-        .navbar {
-            background: white;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            padding: 1rem 0;
-        }
-        
-        .navbar-brand {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--primary-orange) !important;
-        }
-        
-        .package-header {
-            position: relative;
-            min-height: 500px;
-            display: flex;
-            align-items: center;
-            overflow: hidden;
-        }
+    <!-- Additional Meta Tags -->
+    <meta name="theme-color" content="#FF8C00">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="stylesheet" href="{{ asset('css/landing-package.css') }}">
+@endsection
 
-        .package-header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, rgba(255, 140, 0, 0.9) 0%, rgba(44, 44, 44, 0.85) 100%);
-            z-index: 1;
-        }
+@section('custom-styles')
+@endsection
 
-        .package-header-bg {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-        }
+@section('custom-styles')
+@endsection
 
-        .package-header-content {
-            position: relative;
-            z-index: 2;
-            color: white;
-            padding: 80px 0 40px;
-        }
-        
-        .package-title {
-            font-size: 3rem;
-            font-weight: 700;
-            margin-bottom: 1.5rem;
-            color: white;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
-        }
-        
-        .package-meta {
-            display: flex;
-            gap: 2rem;
-            margin-bottom: 2rem;
-            flex-wrap: wrap;
-        }
-        
-        .meta-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: rgba(255,255,255,0.95);
-            font-weight: 500;
-            background: rgba(255,255,255,0.1);
-            padding: 0.5rem 1rem;
-            border-radius: 25px;
-            backdrop-filter: blur(10px);
-        }
-
-        .lead {
-            color: rgba(255,255,255,0.95);
-            font-size: 1.1rem;
-            line-height: 1.6;
-        }
-        
-        .package-image {
-            width: 100%;
-            height: 400px;
-            object-fit: cover;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-        
-        .section-title {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 1.5rem;
-            color: var(--text-dark);
-        }
-        
-        .price-box {
-            background: var(--primary-orange);
-            color: white;
-            padding: 2rem;
-            border-radius: 15px;
-            position: sticky;
-            top: 100px;
-        }
-        
-        .price-box h3 {
-            color: white;
-            margin-bottom: 1.5rem;
-        }
-        
-        .price-item {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 1rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid rgba(255,255,255,0.3);
-        }
-        
-        .btn-book {
-            background: white;
-            color: var(--primary-orange);
-            font-weight: 700;
-            padding: 15px;
-            width: 100%;
-            border: none;
-            border-radius: 10px;
-            font-size: 1.1rem;
-        }
-        
-        .btn-book:hover {
-            background: #f8f9fa;
-        }
-        
-        .highlight-item {
-            padding: 1rem 0;
-            border-bottom: 1px solid #eee;
-        }
-        
-        .highlight-item:last-child {
-            border-bottom: none;
-        }
-
-        .content-card {
-            background: white;
-            border-radius: 15px;
-            padding: 2rem;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
-            margin-bottom: 2rem;
-        }
-
-        .accordion-item {
-            border: none;
-            margin-bottom: 1rem;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        }
-
-        .accordion-button {
-            background: linear-gradient(135deg, #FFF4E6 0%, #FFE5CC 100%);
-            color: var(--text-dark);
-            font-weight: 600;
-            padding: 1.25rem 1.5rem;
-        }
-
-        .accordion-button:not(.collapsed) {
-            background: linear-gradient(135deg, var(--primary-orange) 0%, var(--dark-orange) 100%);
-            color: white;
-            box-shadow: none;
-        }
-
-        .accordion-button:focus {
-            box-shadow: none;
-            border: none;
-        }
-
-        .accordion-body {
-            padding: 1.5rem;
-            background: #fafafa;
-        }
-
-        .timeline {
-            position: relative;
-            padding-left: 0;
-        }
-
-        .timeline-item {
-            position: relative;
-            padding-left: 80px;
-            padding-bottom: 3rem;
-        }
-
-        .timeline-item:last-child {
-            padding-bottom: 0;
-        }
-
-        .timeline-item::before {
-            content: '';
-            position: absolute;
-            left: 26px;
-            top: 60px;
-            bottom: -20px;
-            width: 2px;
-            border-left: 2px dashed #4ecdc4;
-        }
-
-        .timeline-item:last-child::before {
-            display: none;
-        }
-
-        .day-number {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 54px;
-            height: 54px;
-            background: linear-gradient(135deg, #4ecdc4 0%, #44b3aa 100%);
-            color: white;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            font-weight: 700;
-            box-shadow: 0 4px 15px rgba(78, 205, 196, 0.4);
-        }
-
-        .timeline-content h3 {
-            font-size: 1.5rem;
-            margin-bottom: 1.5rem;
-            color: var(--text-dark);
-            font-weight: 700;
-        }
-
-        .activity-item {
-            margin-bottom: 1.5rem;
-        }
-
-        .activity-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: var(--text-dark);
-            margin-bottom: 0.5rem;
-            font-family: 'Poppins', sans-serif;
-        }
-
-        .activity-description {
-            color: var(--text-light);
-            line-height: 1.8;
-            margin-bottom: 0;
-            padding-left: 1.5rem;
-        }
-
-        .activity-extras {
-            margin-top: 1rem;
-        }
-
-        .activity-extras .activity-item {
-            margin-bottom: 0.75rem;
-        }
-
-        .activity-extras .activity-title {
-            font-size: 1rem;
-            font-weight: 500;
-        }
-
-        .timeline-description {
-            color: var(--text-light);
-            line-height: 1.8;
-            margin-bottom: 1.5rem;
-        }
-
-        .timeline-details {
-            list-style: none;
-            padding-left: 0;
-        }
-
-        .timeline-details li {
-            padding: 0.5rem 0;
-            color: var(--text-light);
-            position: relative;
-            padding-left: 1.5rem;
-        }
-
-        .timeline-details li::before {
-            content: '■';
-            position: absolute;
-            left: 0;
-            color: var(--text-dark);
-            font-size: 0.8rem;
-        }
-
-        .tag-badge {
-            display: inline-block;
-            padding: 0.6rem 1.2rem;
-            border-radius: 25px;
-            font-size: 0.9rem;
-            font-weight: 500;
-            margin: 0.25rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-
-        .tab-navigation {
-            background: white;
-            border-radius: 15px;
-            padding: 0.5rem;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
-            margin-bottom: 2rem;
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        .tab-button {
-            flex: 1;
-            padding: 1rem 1.5rem;
-            border: none;
-            background: transparent;
-            color: var(--text-light);
-            font-weight: 600;
-            font-size: 1rem;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-        }
-
-        .tab-button:hover {
-            background: rgba(255, 140, 0, 0.1);
-            color: var(--primary-orange);
-        }
-
-        .tab-button.active {
-            background: linear-gradient(135deg, var(--primary-orange) 0%, var(--dark-orange) 100%);
-            color: white;
-            box-shadow: 0 4px 15px rgba(255, 140, 0, 0.3);
-        }
-
-        .tab-content-panel {
-            display: none;
-        }
-
-        .tab-content-panel.active {
-            display: block;
-            animation: fadeIn 0.3s;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .gallery-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 1rem;
-        }
-
-        .gallery-item {
-            position: relative;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            cursor: pointer;
-            transition: transform 0.3s;
-        }
-
-        .gallery-item:hover {
-            transform: scale(1.05);
-        }
-
-        .gallery-item img {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-        }
-
-        .gallery-caption {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: linear-gradient(180deg, transparent, rgba(0,0,0,0.8));
-            color: white;
-            padding: 1rem;
-            font-size: 0.9rem;
-        }
-        
-        footer {
-            background: #2C2C2C;
-            color: white;
-            padding: 40px 0;
-            text-align: center;
-            margin-top: 80px;
-        }
-
-        @media (max-width: 768px) {
-            .package-title {
-                font-size: 2rem;
-            }
-            .price-box {
-                position: relative;
-                top: 0;
-                margin-top: 2rem;
-            }
-        }
-    </style>
-</head>
-<body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg sticky-top">
-        <div class="container">
-            <a class="navbar-brand" href="{{ route('home') }}">
-                <strong>JJB</strong> Travel Services
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('home') }}#home">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('home') }}#packages">All Packages</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('home') }}#contact">Contact</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+@section('content')
 
     <!-- Package Header -->
     <section class="package-header">
@@ -542,6 +119,111 @@
 
                     <!-- Tab Content: Information -->
                     <div id="tab-information" class="tab-content-panel active">
+                        <div class="content-card">
+                            <!-- Duration Badges -->
+                            <div class="duration-badges">
+                                <div class="duration-badge">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                                        <path d="M6 .5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1H9v1.07a7.001 7.001 0 0 1 3.274 12.474l.601.602a.5.5 0 0 1-.707.708l-.746-.746A6.97 6.97 0 0 1 8 16a6.97 6.97 0 0 1-3.422-.892l-.746.746a.5.5 0 0 1-.707-.708l.602-.602A7.001 7.001 0 0 1 7 2.07V1h-.5A.5.5 0 0 1 6 .5zm2.5 5a.5.5 0 0 0-1 0v3.362l-1.429 2.38a.5.5 0 1 0 .858.515l1.5-2.5A.5.5 0 0 0 8.5 9V5.5zM.86 5.387A2.5 2.5 0 1 1 4.387 1.86 8.035 8.035 0 0 0 .86 5.387zM11.613 1.86a2.5 2.5 0 1 1 3.527 3.527 8.035 8.035 0 0 0-3.527-3.527z"/>
+                                    </svg>
+                                    {{ $package->duration_days }} D {{ $package->duration_nights }} N
+                                </div>
+                                @if($package->min_participants)
+                                <div class="duration-badge">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                                        <path d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1h8zm-7.978-1A.261.261 0 0 1 7 12.996c.001-.264.167-1.03.76-1.72C8.312 10.629 9.282 10 11 10c1.717 0 2.687.63 3.24 1.276.593.69.758 1.457.76 1.72l-.008.002a.274.274 0 0 1-.014.002H7.022zM11 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM6.936 9.28a5.88 5.88 0 0 0-1.23-.247A7.35 7.35 0 0 0 5 9c-4 0-5 3-5 4 0 .667.333 1 1 1h4.216A2.238 2.238 0 0 1 5 13c0-1.01.377-2.042 1.09-2.904.243-.294.526-.569.846-.816zM4.92 10A5.493 5.493 0 0 0 4 13H1c0-.26.164-1.03.76-1.724.545-.636 1.492-1.256 3.16-1.275zM1.5 5.5a3 3 0 1 1 6 0 3 3 0 0 1-6 0zm3-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/>
+                                    </svg>
+                                    {{ $package->min_participants }}+ Person
+                                </div>
+                                @endif
+                            </div>
+
+                            <!-- Description -->
+                            <div style="line-height: 1.8; color: var(--text-light); margin-bottom: 2rem;">
+                                {!! nl2br(e($package->description)) !!}
+                            </div>
+
+                            <!-- Package Details Table -->
+                            <div class="info-table">
+                                @if($package->location)
+                                <div class="info-row">
+                                    <div class="info-label">Destination</div>
+                                    <div class="info-value">{{ $package->location }}</div>
+                                </div>
+                                @endif
+
+                                @if($package->departure_location)
+                                <div class="info-row">
+                                    <div class="info-label">Departure</div>
+                                    <div class="info-value">{{ $package->departure_location }}</div>
+                                </div>
+                                @endif
+
+                                @if($package->departure_time)
+                                <div class="info-row">
+                                    <div class="info-label">Departure Time</div>
+                                    <div class="info-value">{{ $package->departure_time }}</div>
+                                </div>
+                                @endif
+
+                                @if($package->return_time)
+                                <div class="info-row">
+                                    <div class="info-label">Return Time</div>
+                                    <div class="info-value">{{ $package->return_time }}</div>
+                                </div>
+                                @endif
+
+                                @if($package->dress_code)
+                                <div class="info-row">
+                                    <div class="info-label">Dress Code</div>
+                                    <div class="info-value">{{ $package->dress_code }}</div>
+                                </div>
+                                @endif
+
+                                @if($package->inclusions && $package->inclusions->count() > 0)
+                                <div class="info-row">
+                                    <div class="info-label">Included</div>
+                                    <div class="info-value">
+                                        @foreach($package->inclusions as $inclusion)
+                                        <div style="display: flex; gap: 0.75rem; margin-bottom: 0.75rem; align-items: flex-start;">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#4ecdc4" viewBox="0 0 16 16" style="flex-shrink: 0; margin-top: 0.15rem;">
+                                                <path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.267.267 0 0 1 .02-.022z"/>
+                                            </svg>
+                                            <div style="flex: 1;">
+                                                <div style="color: var(--text-light); line-height: 1.4;">{{ $inclusion->title }}</div>
+                                                @if($inclusion->description)
+                                                <small style="color: #999; line-height: 1.3; display: block; margin-top: 0.15rem;">{{ $inclusion->description }}</small>
+                                                @endif
+                                            </div>
+                                        </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                                @endif
+
+                                @if($package->exclusions && $package->exclusions->count() > 0)
+                                <div class="info-row">
+                                    <div class="info-label">Not Included</div>
+                                    <div class="info-value">
+                                        @foreach($package->exclusions as $exclusion)
+                                        <div style="display: flex; gap: 0.75rem; margin-bottom: 0.75rem; align-items: flex-start;">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#dc3545" viewBox="0 0 16 16" style="flex-shrink: 0; margin-top: 0.15rem;">
+                                                <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+                                            </svg>
+                                            <div style="flex: 1;">
+                                                <div style="color: var(--text-light); line-height: 1.4;">{{ $exclusion->title }}</div>
+                                                @if($exclusion->description)
+                                                <small style="color: #999; line-height: 1.3; display: block; margin-top: 0.15rem;">{{ $exclusion->description }}</small>
+                                                @endif
+                                            </div>
+                                        </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                                @endif
+                            </div>
+                        </div>
+
                         <!-- Tags -->
                         @if($package->tags && $package->tags->count() > 0)
                         <div class="content-card">
@@ -551,46 +233,6 @@
                                 <span class="tag-badge" style="background-color: {{ $tag->color ?? '#FF8C00' }}; color: white;">
                                     {{ $tag->name }}
                                 </span>
-                                @endforeach
-                            </div>
-                        </div>
-                        @endif
-                        
-                        <!-- Description -->
-                        <div class="content-card">
-                            <h2 class="section-title">About This Tour</h2>
-                            <div style="line-height: 1.8; color: var(--text-light);">{!! nl2br(e($package->description)) !!}</div>
-                        </div>
-
-                        <!-- Inclusions -->
-                        @if($package->inclusions && $package->inclusions->count() > 0)
-                        <div class="content-card">
-                            <h2 class="section-title">What's Included</h2>
-                            <div class="bg-light p-4 rounded" style="border-left: 4px solid var(--primary-orange);">
-                                @foreach($package->inclusions as $inclusion)
-                                <div class="highlight-item">
-                                    <strong>✓ {{ $inclusion->title }}</strong>
-                                    @if($inclusion->description)
-                                    <br><small class="text-muted">{{ $inclusion->description }}</small>
-                                    @endif
-                                </div>
-                                @endforeach
-                            </div>
-                        </div>
-                        @endif
-
-                        <!-- Exclusions -->
-                        @if($package->exclusions && $package->exclusions->count() > 0)
-                        <div class="content-card">
-                            <h2 class="section-title">What's Not Included</h2>
-                            <div class="bg-light p-4 rounded" style="border-left: 4px solid #dc3545;">
-                                @foreach($package->exclusions as $exclusion)
-                                <div class="highlight-item">
-                                    <strong>✗ {{ $exclusion->title }}</strong>
-                                    @if($exclusion->description)
-                                    <br><small class="text-muted">{{ $exclusion->description }}</small>
-                                    @endif
-                                </div>
                                 @endforeach
                             </div>
                         </div>
@@ -721,7 +363,7 @@
                         @endif
 
                         <div class="mt-4">
-                            <a href="{{ route('home') }}#contact" class="btn btn-book">Contact to Book</a>
+                            <a href="https://wa.me/6281399491466?text={{ urlencode('Hi, I am interested in booking: ' . $package->name) }}" target="_blank" class="btn btn-book">Contact to Book</a>
                         </div>
 
                         @if($package->min_participants)
@@ -734,19 +376,9 @@
             </div>
         </div>
     </section>
+@endsection
 
-    <!-- Footer -->
-    <footer>
-        <div class="container">
-            <p class="mb-2"><strong>JJB Travel Services</strong></p>
-            <p class="mb-0">Java Representative - Your trusted partner for Indonesian adventures</p>
-            <p class="mt-3">&copy; {{ date('Y') }} JJB Travel Services. All rights reserved.</p>
-        </div>
-    </footer>
-
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    
+@section('scripts')
     <!-- Tab Switching Script -->
     <script>
         function switchTab(tabName) {
@@ -773,5 +405,4 @@
             });
         }
     </script>
-</body>
-</html>
+@endsection

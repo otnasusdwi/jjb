@@ -23,6 +23,25 @@
                 <h5 class="card-title mb-0">Tag Information</h5>
             </div>
             <div class="card-body">
+                @if ($errors->any())
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <h5 class="alert-heading"><i class="ri-error-warning-line me-2"></i>Validation Errors</h5>
+                        <ul class="mb-0">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @endif
+
+                @if(session('error'))
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="ri-error-warning-line me-2"></i>{{ session('error') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @endif
+
                 <form action="{{ route('admin.tags.update', $tag) }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
@@ -177,7 +196,7 @@
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
                                 <h6 class="mb-1">{{ $package->title }}</h6>
-                                <small class="text-muted">{{ $package->category->name }} • Rp {{ number_format($package->price) }}</small>
+                                <small class="text-muted">{{ $package->category }}</small>
                             </div>
                             <i class="ri-arrow-right-line"></i>
                         </div>
@@ -234,6 +253,25 @@
         </div>
     </div>
 </div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteGalleryModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Delete Image</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this image? This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete Image</button>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @push('scripts')
@@ -277,6 +315,8 @@ typeSelect.addEventListener('change', function() {
 
 // Gallery management
 let galleryCounter = 0;
+let deleteModal;
+let currentDeleteGalleryId = null;
 
 function addGalleryImage() {
     galleryCounter++;
@@ -314,15 +354,53 @@ function removeGalleryImage(imageId) {
     document.getElementById('gallery-' + imageId).remove();
 }
 
-function removeExistingGallery(galleryId, dbId) {
-    const galleryDiv = document.getElementById('gallery-' + galleryId);
-    const form = document.querySelector('form');
-    const deleteInput = document.createElement('input');
-    deleteInput.type = 'hidden';
-    deleteInput.name = 'delete_galleries[]';
-    deleteInput.value = dbId;
-    form.appendChild(deleteInput);
-    galleryDiv.remove();
+function showDeleteModal(galleryId) {
+    currentDeleteGalleryId = galleryId;
+    deleteModal.show();
+}
+
+function deleteGalleryViaAjax() {
+    if (!currentDeleteGalleryId) return;
+
+    const tagId = {{ $tag->id }};
+    
+    fetch(`/admin/tags/${tagId}/gallery/${currentDeleteGalleryId}`, {
+        method: 'DELETE',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            'Accept': 'application/json'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Delete failed');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            // Hapus dari DOM
+            const galleryDiv = document.querySelector(`[data-gallery-id="${currentDeleteGalleryId}"]`);
+            if (galleryDiv) {
+                galleryDiv.remove();
+            }
+            deleteModal.hide();
+            
+            // Tampilkan success message
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-success alert-dismissible fade show';
+            alertDiv.innerHTML = `
+                <i class="ri-check-line me-2"></i> Image deleted successfully!
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.querySelector('.card').insertAdjacentElement('beforebegin', alertDiv);
+            setTimeout(() => alertDiv.remove(), 3000);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Failed to delete image. Please try again.');
+    });
 }
 
 function previewGalleryImage(event, imageId) {
@@ -342,6 +420,9 @@ function previewGalleryImage(event, imageId) {
 
 // Load existing galleries
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize delete modal
+    deleteModal = new bootstrap.Modal(document.getElementById('deleteGalleryModal'));
+    
     const galleryData = @json($tag->galleries ?? []);
     
     if (Array.isArray(galleryData) && galleryData.length > 0) {
@@ -352,7 +433,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="border rounded p-3 mb-3" id="gallery-${galleryCounter}" data-gallery-id="${gallery.id}">
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <h6 class="mb-0">Image ${galleryCounter}</h6>
-                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeExistingGallery(${galleryCounter}, ${gallery.id})">
+                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="showDeleteModal(${gallery.id})">
                             <i class="ri-delete-bin-line"></i> Delete
                         </button>
                     </div>
@@ -362,14 +443,23 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div class="mb-2">
                         <label class="form-label">Caption</label>
                         <input type="text" class="form-control form-control-sm" 
+                               name="existing_gallery_captions[${gallery.id}]"
                                value="${gallery.caption || ''}" 
-                               readonly>
+                               placeholder="e.g., Beautiful sunset at Tanah Lot">
                     </div>
-                    <div class="form-text">Existing image - click delete to remove</div>
+                    <div class="form-text">Existing image - edit caption or click delete to remove</div>
                 </div>
             `;
             document.getElementById('gallery-container').insertAdjacentHTML('beforeend', galleryHtml);
         });
+    }
+});
+
+// Setup delete button in modal
+document.addEventListener('DOMContentLoaded', function() {
+    const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+    if (confirmDeleteBtn) {
+        confirmDeleteBtn.addEventListener('click', deleteGalleryViaAjax);
     }
 });
 </script>
