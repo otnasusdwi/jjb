@@ -13,9 +13,14 @@
     <!-- Hero Section -->
     <section class="hero-section" id="home">
         <div class="hero-background-carousel">
+            @forelse($heroBanners as $banner)
+            <div class="hero-bg-item {{ $loop->first ? 'active' : '' }}" style="background-image: url('{{ asset('storage/' . $banner->image_path) }}');"></div>
+            @empty
+            <!-- Fallback to static images if no banners exist -->
             <div class="hero-bg-item active" style="background-image: url('{{ asset('images/hero/hero-1.jpg') }}');"></div>
             <div class="hero-bg-item" style="background-image: url('{{ asset('images/hero/hero-2.jpg') }}');"></div>
             <div class="hero-bg-item" style="background-image: url('{{ asset('images/hero/hero-3.jpg') }}');"></div>
+            @endforelse
         </div>
         <div class="hero-overlay"></div>
         <div class="container position-relative">

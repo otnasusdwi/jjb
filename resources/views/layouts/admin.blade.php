@@ -133,6 +133,13 @@
                             Tags
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('admin.hero-banners.*') ? 'active' : '' }}"
+                           href="{{ route('admin.hero-banners.index') }}">
+                            <i class="ri-image-add-line me-2"></i>
+                            Hero Banners
+                        </a>
+                    </li>
                     {{-- <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('admin.bookings.*') ? 'active' : '' }}"
                            href="{{ route('admin.bookings.index') }}">

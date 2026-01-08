@@ -5,6 +5,7 @@ use App\Http\Controllers\LandingController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\TravelPackageController;
 use App\Http\Controllers\Admin\TagController;
+use App\Http\Controllers\Admin\HeroBannerController;
 use App\Http\Controllers\Admin\BookingController as AdminBookingController;
 use App\Http\Controllers\Admin\PaymentController as AdminPaymentController;
 use App\Http\Controllers\Admin\ReportController;
@@ -34,6 +35,17 @@ Route::prefix('register/affiliate')->group(function () {
 Route::prefix('admin')->name('admin.')->group(function () {
     // Dashboard
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+
+    // Hero Banners Management
+    Route::prefix('hero-banners')->name('hero-banners.')->group(function () {
+        Route::get('/', [HeroBannerController::class, 'index'])->name('index');
+        Route::get('/create', [HeroBannerController::class, 'create'])->name('create');
+        Route::post('/', [HeroBannerController::class, 'store'])->name('store');
+        Route::get('/{heroBanner}', [HeroBannerController::class, 'show'])->name('show');
+        Route::get('/{heroBanner}/edit', [HeroBannerController::class, 'edit'])->name('edit');
+        Route::put('/{heroBanner}', [HeroBannerController::class, 'update'])->name('update');
+        Route::delete('/{heroBanner}', [HeroBannerController::class, 'destroy'])->name('destroy');
+    });
 
     // Affiliate Management
     Route::prefix('affiliates')->name('affiliates.')->group(function () {

@@ -4,12 +4,18 @@ namespace App\Http\Controllers;
 
 use App\Models\TravelPackage;
 use App\Models\PackageCategory;
+use App\Models\HeroBanner;
 use Illuminate\Http\Request;
 
 class LandingController extends Controller
 {
     public function index()
     {
+        // Get active hero banners ordered by display order
+        $heroBanners = HeroBanner::where('is_active', true)
+            ->orderBy('order')
+            ->get();
+
         // Get all active packages with tags for filtering
         $packages = TravelPackage::with('tags')
             ->where('status', 'active')
@@ -25,7 +31,7 @@ class LandingController extends Controller
             ->ordered()
             ->get();
 
-        return view('landing.index', compact('packages', 'destinationTags'));
+        return view('landing.index', compact('heroBanners', 'packages', 'destinationTags'));
     }
 
     public function showPackage($slug)
