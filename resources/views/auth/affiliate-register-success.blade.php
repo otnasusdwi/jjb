@@ -96,7 +96,7 @@
                                 <div class="col-md-6">
                                     <i class="bi bi-whatsapp"></i>
                                     <small class="d-block">WhatsApp</small>
-                                    <a href="https://wa.me/6281399491466" class="small">+62 813-9949-1466</a>
+                                    <a href="https://wa.me/{{ config('contact.whatsapp_number') }}" class="small">+62 813-9949-1466</a>
                                 </div>
                             </div>
                         </div>

@@ -342,7 +342,7 @@
                 <strong>Hi there! 👋</strong><br>
                 How can we help you plan your Indonesian adventure today?
             </div>
-            <a href="https://wa.me/6281399491466?text={{ urlencode('Hi, I would like to know more about your travel packages') }}" target="_blank" class="whatsapp-popup-btn">
+            <a href="https://wa.me/{{ config('contact.whatsapp_number') }}?text={{ urlencode('Hi, I would like to know more about your travel packages') }}" target="_blank" class="whatsapp-popup-btn">
                 <i class="bi bi-whatsapp"></i> Start Chat
             </a>
         </div>

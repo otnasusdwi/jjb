@@ -321,7 +321,7 @@
                         @endif
 
                         <div class="mt-4">
-                            <a href="https://wa.me/6281399491466?text={{ urlencode('Hi, I am interested in booking: ' . $package->name) }}" target="_blank" class="btn btn-book">Contact to Book</a>
+                            <a href="https://wa.me/{{ config('contact.whatsapp_number') }}?text={{ urlencode('Hi, I am interested in booking: ' . $package->name) }}" target="_blank" class="btn btn-book">Contact to Book</a>
                         </div>
 
                         @if($package->min_participants)

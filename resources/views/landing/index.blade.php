@@ -243,7 +243,7 @@
         <div class="container">
             <h2>Ready to Start Your Indonesian Adventure?</h2>
             <p class="mb-4">Contact us today to plan your perfect journey</p>
-            <a href="https://wa.me/6281399491466?text={{ urlencode('Hi, I would like to know more about your travel packages') }}" target="_blank" class="btn">Contact Us</a>
+            <a href="https://wa.me/{{ config('contact.whatsapp_number') }}?text={{ urlencode('Hi, I would like to know more about your travel packages') }}" target="_blank" class="btn">Contact Us</a>
         </div>
     </section>
 @endsection
