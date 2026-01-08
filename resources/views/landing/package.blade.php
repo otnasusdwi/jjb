@@ -186,14 +186,11 @@
                                     <div class="info-value">
                                         @foreach($package->inclusions as $inclusion)
                                         <div style="display: flex; gap: 0.75rem; margin-bottom: 0.75rem; align-items: flex-start;">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#4ecdc4" viewBox="0 0 16 16" style="flex-shrink: 0; margin-top: 0.15rem;">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="#4ecdc4" viewBox="0 0 16 16" style="flex-shrink: 0; margin-top: 0.25rem;">
                                                 <path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.267.267 0 0 1 .02-.022z"/>
                                             </svg>
                                             <div style="flex: 1;">
-                                                <div style="color: var(--text-light); line-height: 1.4;">{{ $inclusion->title }}</div>
-                                                @if($inclusion->description)
-                                                <small style="color: #999; line-height: 1.3; display: block; margin-top: 0.15rem;">{{ $inclusion->description }}</small>
-                                                @endif
+                                                <div style="color: #2C2C2C; line-height: 1.6; font-size: 1rem;">{{ $inclusion->description }}</div>
                                             </div>
                                         </div>
                                         @endforeach
@@ -207,14 +204,11 @@
                                     <div class="info-value">
                                         @foreach($package->exclusions as $exclusion)
                                         <div style="display: flex; gap: 0.75rem; margin-bottom: 0.75rem; align-items: flex-start;">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#dc3545" viewBox="0 0 16 16" style="flex-shrink: 0; margin-top: 0.15rem;">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="#dc3545" viewBox="0 0 16 16" style="flex-shrink: 0; margin-top: 0.25rem;">
                                                 <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
                                             </svg>
                                             <div style="flex: 1;">
-                                                <div style="color: var(--text-light); line-height: 1.4;">{{ $exclusion->title }}</div>
-                                                @if($exclusion->description)
-                                                <small style="color: #999; line-height: 1.3; display: block; margin-top: 0.15rem;">{{ $exclusion->description }}</small>
-                                                @endif
+                                                <div style="color: #2C2C2C; line-height: 1.6; font-size: 1rem;">{{ $exclusion->description }}</div>
                                             </div>
                                         </div>
                                         @endforeach
@@ -241,52 +235,23 @@
 
                     <!-- Tab Content: Itinerary -->
                     <div id="tab-itinerary" class="tab-content-panel">
-                        @if(isset($groupedItineraries) && $groupedItineraries->count() > 0)
+                        @if($package->itineraries && $package->itineraries->count() > 0)
                         <div class="content-card">
                             <h2 class="section-title">Itinerary</h2>
                             <div class="timeline">
-                                @foreach($groupedItineraries as $dayNumber => $dayItineraries)
+                                @foreach($package->itineraries as $itinerary)
                                 <div class="timeline-item">
-                                    <div class="day-number">{{ $dayNumber }}</div>
+                                    <div class="day-number">{{ $itinerary->day_number }}</div>
                                     <div class="timeline-content">
-                                        <h3>Day {{ $dayNumber }}</h3>
-                                        
-                                        @foreach($dayItineraries as $itinerary)
-                                        <div class="activity-item">
-                                            <h4 class="activity-title">{{ $itinerary->title }}</h4>
-                                            @if($itinerary->description)
-                                            <p class="activity-description">{{ $itinerary->description }}</p>
-                                            @endif
-                                        </div>
-                                        @endforeach
-
-                                        @php
-                                            // Get meals and accommodation from any itinerary in this day
-                                            $firstItinerary = $dayItineraries->first();
-                                        @endphp
-                                        @if($firstItinerary && ($firstItinerary->breakfast || $firstItinerary->lunch || $firstItinerary->dinner || $firstItinerary->accommodation))
-                                        <div class="activity-extras">
-                                            @if($firstItinerary->accommodation)
-                                            <div class="activity-item">
-                                                <h4 class="activity-title">🏨 {{ $firstItinerary->accommodation }}</h4>
-                                            </div>
-                                            @endif
-                                            @if($firstItinerary->breakfast)
-                                            <div class="activity-item">
-                                                <h4 class="activity-title">🍳 Breakfast</h4>
-                                            </div>
-                                            @endif
-                                            @if($firstItinerary->lunch)
-                                            <div class="activity-item">
-                                                <h4 class="activity-title">🍽️ Lunch</h4>
-                                            </div>
-                                            @endif
-                                            @if($firstItinerary->dinner)
-                                            <div class="activity-item">
-                                                <h4 class="activity-title">🍷 Dinner</h4>
-                                            </div>
-                                            @endif
-                                        </div>
+                                        <h3>Day {{ $itinerary->day_number }}@if($itinerary->day_title) - {{ $itinerary->day_title }}@endif</h3>
+                                        @if($itinerary->items && $itinerary->items->count() > 0)
+                                        <ul class="activity-list">
+                                            @foreach($itinerary->items as $item)
+                                            <li>{{ $item->title }}</li>
+                                            @endforeach
+                                        </ul>
+                                        @else
+                                        <p class="text-muted mb-0">No items available for this day.</p>
                                         @endif
                                     </div>
                                 </div>
@@ -341,24 +306,17 @@
                     <div class="price-box">
                         <h3>Pricing</h3>
                         
-                        @if($package->price_adult)
+                        @if($package->price)
                         <div class="price-item">
                             <span>Adult</span>
-                            <strong>Rp {{ number_format($package->price_adult, 0, ',', '.') }}</strong>
+                            <strong>{{ $package->currency }} {{ number_format($package->price, 0, ',', '.') }}</strong>
                         </div>
                         @endif
                         
-                        @if($package->price_child)
+                        @if($package->child_price)
                         <div class="price-item">
                             <span>Child</span>
-                            <strong>Rp {{ number_format($package->price_child, 0, ',', '.') }}</strong>
-                        </div>
-                        @endif
-                        
-                        @if($package->price_infant)
-                        <div class="price-item">
-                            <span>Infant</span>
-                            <strong>Rp {{ number_format($package->price_infant, 0, ',', '.') }}</strong>
+                            <strong>{{ $package->currency }} {{ number_format($package->child_price, 0, ',', '.') }}</strong>
                         </div>
                         @endif
 

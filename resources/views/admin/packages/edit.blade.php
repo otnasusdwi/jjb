@@ -3,210 +3,446 @@
 @section('title', 'Edit Package')
 
 @section('content')
-<div class="container-fluid">
-    <!-- Page Header -->
-    <div class="page-title-box mb-4">
-        <div class="row align-items-center">
-            <div class="col-md-8">
-                <h4 class="page-title mb-1">Edit Package</h4>
-                <ol class="breadcrumb m-0">
-                    <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-                    <li class="breadcrumb-item"><a href="{{ route('admin.packages.index') }}">Packages</a></li>
-                    <li class="breadcrumb-item active">Edit</li>
-                </ol>
-            </div>
-            <div class="col-md-4">
-                <div class="float-end">
-                    <a href="{{ route('admin.packages.index') }}" class="btn btn-outline-secondary">
-                        <i class="ri-arrow-left-line me-1"></i> Back
-                    </a>
+    <div class="container-fluid">
+        <!-- Page Header -->
+        <div class="page-title-box mb-4">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h4 class="page-title mb-1">Edit Package</h4>
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('admin.packages.index') }}">Packages</a></li>
+                        <li class="breadcrumb-item active">Edit</li>
+                    </ol>
+                </div>
+                <div class="col-md-4">
+                    <div class="float-end">
+                        <a href="{{ route('admin.packages.index') }}" class="btn btn-outline-secondary">
+                            <i class="ri-arrow-left-line me-1"></i> Back
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    @if ($errors->any())
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <strong>Validation Errors:</strong>
-            <ul class="mb-0">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
+        @if ($errors->any())
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <strong>Validation Errors:</strong>
+                <ul class="mb-0">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        @endif
+
+        <form action="{{ route('admin.packages.update', $package) }}" method="POST" enctype="multipart/form-data"
+            id="packageForm">
+            @csrf
+            @method('PUT')
+
+            <!-- Tabs Navigation -->
+            <ul class="nav nav-tabs mb-4" id="packageTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="basic-tab" data-bs-toggle="tab" data-bs-target="#basic"
+                        type="button" role="tab">
+                        <i class="ri-information-line me-1"></i> Basic Info & Pricing
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="images-tab" data-bs-toggle="tab" data-bs-target="#images" type="button"
+                        role="tab">
+                        <i class="ri-image-line me-1"></i> Images
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="itinerary-tab" data-bs-toggle="tab" data-bs-target="#itinerary"
+                        type="button" role="tab">
+                        <i class="ri-route-line me-1"></i> Itinerary
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="inclusions-tab" data-bs-toggle="tab" data-bs-target="#inclusions"
+                        type="button" role="tab">
+                        <i class="ri-check-double-line me-1"></i> Inclusions & Exclusions
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="settings-tab" data-bs-toggle="tab" data-bs-target="#settings"
+                        type="button" role="tab">
+                        <i class="ri-settings-3-line me-1"></i> Settings & SEO
+                    </button>
+                </li>
             </ul>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    @endif
 
-    <form action="{{ route('admin.packages.update', $package) }}" method="POST" enctype="multipart/form-data" id="packageForm">
-        @csrf
-        @method('PUT')
-        
-        <!-- Tabs Navigation -->
-        <ul class="nav nav-tabs mb-4" id="packageTabs" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="basic-tab" data-bs-toggle="tab" data-bs-target="#basic" type="button" role="tab">
-                    <i class="ri-information-line me-1"></i> Basic Info & Pricing
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="images-tab" data-bs-toggle="tab" data-bs-target="#images" type="button" role="tab">
-                    <i class="ri-image-line me-1"></i> Images
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="itinerary-tab" data-bs-toggle="tab" data-bs-target="#itinerary" type="button" role="tab">
-                    <i class="ri-route-line me-1"></i> Itinerary
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="inclusions-tab" data-bs-toggle="tab" data-bs-target="#inclusions" type="button" role="tab">
-                    <i class="ri-check-double-line me-1"></i> Inclusions & Exclusions
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="settings-tab" data-bs-toggle="tab" data-bs-target="#settings" type="button" role="tab">
-                    <i class="ri-settings-3-line me-1"></i> Settings & SEO
-                </button>
-            </li>
-        </ul>
-
-        <!-- Tabs Content -->
-        <div class="tab-content" id="packageTabsContent">
-            <!-- Basic Info & Pricing Tab -->
-            <div class="tab-pane fade show active" id="basic" role="tabpanel">
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="card mb-3">
-                            <div class="card-header">
-                                <h5 class="card-title mb-0">Basic Information</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="mb-3">
-                                    <label for="name" class="form-label">Package Name <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control @error('name') is-invalid @enderror"
-                                           id="name" name="name" value="{{ old('name', $package->name) }}" required>
-                                    @error('name')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
+            <!-- Tabs Content -->
+            <div class="tab-content" id="packageTabsContent">
+                <!-- Basic Info & Pricing Tab -->
+                <div class="tab-pane fade show active" id="basic" role="tabpanel">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="card mb-3">
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0">Basic Information</h5>
                                 </div>
-
-                                <div class="mb-3">
-                                    <label for="description" class="form-label">Description <span class="text-danger">*</span></label>
-                                    <textarea class="form-control @error('description') is-invalid @enderror"
-                                              id="description" name="description" rows="5" required>{{ old('description', $package->description) }}</textarea>
-                                    @error('description')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="mb-3">
-                                            <label for="location" class="form-label">Location <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control @error('location') is-invalid @enderror"
-                                                   id="location" name="location" value="{{ old('location', $package->location) }}" required>
-                                            @error('location')
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                            @enderror
-                                        </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label for="name" class="form-label">Package Name <span
+                                                class="text-danger">*</span></label>
+                                        <input type="text" class="form-control @error('name') is-invalid @enderror"
+                                            id="name" name="name" value="{{ old('name', $package->name) }}"
+                                            required>
+                                        @error('name')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
                                     </div>
-                                    <div class="col-md-6">
-                                        <div class="mb-3">
-                                            <label for="category" class="form-label">Category</label>
-                                            <select class="form-select @error('category') is-invalid @enderror"
+
+                                    <div class="mb-3">
+                                        <label for="description" class="form-label">Description <span
+                                                class="text-danger">*</span></label>
+                                        <textarea class="form-control @error('description') is-invalid @enderror" id="description" name="description"
+                                            rows="5" required>{{ old('description', $package->description) }}</textarea>
+                                        @error('description')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="location" class="form-label">Location <span
+                                                        class="text-danger">*</span></label>
+                                                <input type="text"
+                                                    class="form-control @error('location') is-invalid @enderror"
+                                                    id="location" name="location"
+                                                    value="{{ old('location', $package->location) }}" required>
+                                                @error('location')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="category" class="form-label">Category</label>
+                                                <select class="form-select @error('category') is-invalid @enderror"
                                                     id="category" name="category">
-                                                <option value="">Select Category</option>
-                                                <option value="cultural" {{ old('category', $package->category) === 'cultural' ? 'selected' : '' }}>Cultural Tours</option>
-                                                <option value="adventure" {{ old('category', $package->category) === 'adventure' ? 'selected' : '' }}>Adventure</option>
-                                                <option value="beach" {{ old('category', $package->category) === 'beach' ? 'selected' : '' }}>Beach & Marine</option>
-                                                <option value="spiritual" {{ old('category', $package->category) === 'spiritual' ? 'selected' : '' }}>Spiritual</option>
-                                                <option value="nature" {{ old('category', $package->category) === 'nature' ? 'selected' : '' }}>Nature</option>
-                                            </select>
-                                            @error('category')
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                            @enderror
+                                                    <option value="">Select Category</option>
+                                                    <option value="cultural"
+                                                        {{ old('category', $package->category) === 'cultural' ? 'selected' : '' }}>
+                                                        Cultural Tours</option>
+                                                    <option value="adventure"
+                                                        {{ old('category', $package->category) === 'adventure' ? 'selected' : '' }}>
+                                                        Adventure</option>
+                                                    <option value="beach"
+                                                        {{ old('category', $package->category) === 'beach' ? 'selected' : '' }}>
+                                                        Beach & Marine</option>
+                                                    <option value="spiritual"
+                                                        {{ old('category', $package->category) === 'spiritual' ? 'selected' : '' }}>
+                                                        Spiritual</option>
+                                                    <option value="nature"
+                                                        {{ old('category', $package->category) === 'nature' ? 'selected' : '' }}>
+                                                        Nature</option>
+                                                </select>
+                                                @error('category')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label for="duration_days" class="form-label">Days <span
+                                                        class="text-danger">*</span></label>
+                                                <input type="number" min="1" max="30"
+                                                    class="form-control @error('duration_days') is-invalid @enderror"
+                                                    id="duration_days" name="duration_days"
+                                                    value="{{ old('duration_days', $package->duration_days) }}" required>
+                                                @error('duration_days')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label for="duration_nights" class="form-label">Nights</label>
+                                                <input type="number" min="0" max="30"
+                                                    class="form-control @error('duration_nights') is-invalid @enderror"
+                                                    id="duration_nights" name="duration_nights"
+                                                    value="{{ old('duration_nights', $package->duration_nights) }}">
+                                                @error('duration_nights')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label for="max_participants" class="form-label">Max Participants</label>
+                                                <input type="number" min="1" max="100"
+                                                    class="form-control @error('max_participants') is-invalid @enderror"
+                                                    id="max_participants" name="max_participants"
+                                                    value="{{ old('max_participants', $package->max_participants) }}">
+                                                @error('max_participants')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
+                            </div>
 
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <div class="mb-3">
-                                            <label for="duration_days" class="form-label">Days <span class="text-danger">*</span></label>
-                                            <input type="number" min="1" max="30"
-                                                   class="form-control @error('duration_days') is-invalid @enderror"
-                                                   id="duration_days" name="duration_days" value="{{ old('duration_days', $package->duration_days) }}" required>
-                                            @error('duration_days')
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                            @enderror
-                                        </div>
+                            <!-- Pricing -->
+                            <div class="card mb-3">
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0">Pricing</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label for="currency" class="form-label">Currency <span
+                                                class="text-danger">*</span></label>
+                                        <select class="form-select @error('currency') is-invalid @enderror" id="currency"
+                                            name="currency" required>
+                                            <option value="IDR"
+                                                {{ old('currency', $package->currency) === 'IDR' ? 'selected' : '' }}>IDR -
+                                                Indonesian Rupiah</option>
+                                            <option value="USD"
+                                                {{ old('currency', $package->currency) === 'USD' ? 'selected' : '' }}>USD -
+                                                US Dollar</option>
+                                        </select>
+                                        @error('currency')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
                                     </div>
-                                    <div class="col-md-4">
-                                        <div class="mb-3">
-                                            <label for="duration_nights" class="form-label">Nights</label>
-                                            <input type="number" min="0" max="30"
-                                                   class="form-control @error('duration_nights') is-invalid @enderror"
-                                                   id="duration_nights" name="duration_nights" value="{{ old('duration_nights', $package->duration_nights) }}">
-                                            @error('duration_nights')
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                            @enderror
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="price" class="form-label">Adult Price <span
+                                                        class="text-danger">*</span></label>
+                                                <input type="number" step="0.01" min="0"
+                                                    class="form-control @error('price') is-invalid @enderror"
+                                                    id="price" name="price"
+                                                    value="{{ old('price', $package->price) }}" required>
+                                                @error('price')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="mb-3">
-                                            <label for="max_participants" class="form-label">Max Participants</label>
-                                            <input type="number" min="1" max="100"
-                                                   class="form-control @error('max_participants') is-invalid @enderror"
-                                                   id="max_participants" name="max_participants" value="{{ old('max_participants', $package->max_participants) }}">
-                                            @error('max_participants')
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                            @enderror
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="child_price" class="form-label">Child Price</label>
+                                                <input type="number" step="0.01" min="0"
+                                                    class="form-control @error('child_price') is-invalid @enderror"
+                                                    id="child_price" name="child_price"
+                                                    value="{{ old('child_price', $package->child_price) }}">
+                                                @error('child_price')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
+                                                <div class="form-text">Leave empty if same as adult price</div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>
 
-                        <!-- Pricing -->
-                        <div class="card mb-3">
-                            <div class="card-header">
-                                <h5 class="card-title mb-0">Pricing</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="mb-3">
-                                    <label for="currency" class="form-label">Currency <span class="text-danger">*</span></label>
-                                    <select class="form-select @error('currency') is-invalid @enderror" id="currency" name="currency" required>
-                                        <option value="IDR" {{ old('currency', $package->currency) === 'IDR' ? 'selected' : '' }}>IDR - Indonesian Rupiah</option>
-                                        <option value="USD" {{ old('currency', $package->currency) === 'USD' ? 'selected' : '' }}>USD - US Dollar</option>
-                                    </select>
-                                    @error('currency')
+                <!-- Images Tab -->
+                <div class="tab-pane fade" id="images" role="tabpanel">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="card mb-3">
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0">Featured Image</h5>
+                                </div>
+                                <div class="card-body text-center">
+                                    <div class="image-preview mb-3"
+                                        style="min-height: 250px; border: 2px dashed #ddd; display: flex; align-items: center; justify-content: center;">
+                                        @if ($package->featured_image)
+                                            <img id="image-preview"
+                                                src="{{ asset('storage/' . $package->featured_image) }}" alt="Preview"
+                                                style="max-width: 100%; max-height: 250px;">
+                                        @else
+                                            <img id="image-preview" src="#" alt="Preview"
+                                                style="max-width: 100%; max-height: 250px; display: none;">
+                                            <div id="image-placeholder" class="text-muted">
+                                                <i class="ri-image-line" style="font-size: 48px;"></i>
+                                                <p class="mt-2">Upload featured image</p>
+                                            </div>
+                                        @endif
+                                    </div>
+                                    <input type="file"
+                                        class="form-control @error('featured_image') is-invalid @enderror"
+                                        id="featured_image" name="featured_image" accept="image/*"
+                                        onchange="previewImage(event)">
+                                    @error('featured_image')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
+                                    <div class="form-text">Max file size: 5MB. Recommended: 1200x800px</div>
                                 </div>
+                            </div>
+                        </div>
 
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="mb-3">
-                                            <label for="price" class="form-label">Adult Price <span class="text-danger">*</span></label>
-                                            <input type="number" step="0.01" min="0"
-                                                   class="form-control @error('price') is-invalid @enderror"
-                                                   id="price" name="price" value="{{ old('price', $package->price) }}" required>
-                                            @error('price')
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                            @enderror
-                                        </div>
+                        <div class="col-lg-6">
+                            <div class="card mb-3">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h5 class="card-title mb-0">Gallery Images</h5>
+                                    <button type="button" class="btn btn-sm btn-primary" onclick="addGalleryImage()">
+                                        <i class="ri-add-line"></i> Add Image
+                                    </button>
+                                </div>
+                                <div class="card-body">
+                                    <div id="gallery-container"></div>
+                                    <div class="form-text">Recommended: 1200x800px, Max 2MB per image</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Itinerary Tab -->
+                <div class="tab-pane fade" id="itinerary" role="tabpanel">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="card-title mb-0">Itinerary</h5>
+                            <button type="button" class="btn btn-sm btn-primary" onclick="addItineraryDay()">
+                                <i class="ri-add-line"></i> Add Day
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div id="itinerary-container"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Inclusions & Exclusions Tab -->
+                <div class="tab-pane fade" id="inclusions" role="tabpanel">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="card">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h5 class="card-title mb-0">What's Included</h5>
+                                    <button type="button" class="btn btn-sm btn-success" onclick="addInclusion()">
+                                        <i class="ri-add-line"></i> Add
+                                    </button>
+                                </div>
+                                <div class="card-body">
+                                    <div id="inclusions-container"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6">
+                            <div class="card">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h5 class="card-title mb-0">What's Not Included</h5>
+                                    <button type="button" class="btn btn-sm btn-danger" onclick="addExclusion()">
+                                        <i class="ri-add-line"></i> Add
+                                    </button>
+                                </div>
+                                <div class="card-body">
+                                    <div id="exclusions-container"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Settings & SEO Tab -->
+                <div class="tab-pane fade" id="settings" role="tabpanel">
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="card mb-3">
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0"><i class="ri-price-tag-3-line"></i> Tags</h5>
+                                </div>
+                                <div class="card-body">
+                                    <label for="tags" class="form-label">Select Tags</label>
+                                    <select id="tags" name="tags[]" class="form-select" multiple>
+                                        @if (isset($tags) && $tags->count() > 0)
+                                            @foreach ($tags as $type => $typeTags)
+                                                <optgroup label="{{ ucfirst($type) }}">
+                                                    @foreach ($typeTags as $tag)
+                                                        <option value="{{ $tag->id }}"
+                                                            {{ collect(old('tags', $package->tags->pluck('id')->toArray()))->contains($tag->id) ? 'selected' : '' }}>
+                                                            {{ $tag->emoji ?? '' }} {{ $tag->name }}
+                                                        </option>
+                                                    @endforeach
+                                                </optgroup>
+                                            @endforeach
+                                        @endif
+                                    </select>
+                                    <div class="form-text">Select multiple tags</div>
+                                </div>
+                            </div>
+                            <!-- Settings -->
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0">Settings</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label for="status" class="form-label">Status</label>
+                                        <select class="form-select @error('status') is-invalid @enderror" id="status"
+                                            name="status">
+                                            <option value="draft"
+                                                {{ old('status', $package->status) === 'draft' ? 'selected' : '' }}>Draft
+                                            </option>
+                                            <option value="active"
+                                                {{ old('status', $package->status) === 'active' ? 'selected' : '' }}>Active
+                                            </option>
+                                            <option value="inactive"
+                                                {{ old('status', $package->status) === 'inactive' ? 'selected' : '' }}>
+                                                Inactive</option>
+                                        </select>
+                                        @error('status')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
                                     </div>
-                                    <div class="col-md-6">
-                                        <div class="mb-3">
-                                            <label for="child_price" class="form-label">Child Price</label>
-                                            <input type="number" step="0.01" min="0"
-                                                   class="form-control @error('child_price') is-invalid @enderror"
-                                                   id="child_price" name="child_price" value="{{ old('child_price', $package->child_price) }}">
-                                            @error('child_price')
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                            @enderror
-                                            <div class="form-text">Leave empty if same as adult price</div>
-                                        </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-8">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0"><i class="ri-search-line"></i> SEO Settings</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label for="meta_title" class="form-label">Meta Title</label>
+                                        <input type="text"
+                                            class="form-control @error('meta_title') is-invalid @enderror"
+                                            id="meta_title" name="meta_title"
+                                            value="{{ old('meta_title', $package->meta_title) }}" maxlength="60">
+                                        @error('meta_title')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                        <div class="form-text">Recommended: 50-60 characters</div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="meta_description" class="form-label">Meta Description</label>
+                                        <textarea class="form-control @error('meta_description') is-invalid @enderror" id="meta_description"
+                                            name="meta_description" rows="3" maxlength="160">{{ old('meta_description', $package->meta_description) }}</textarea>
+                                        @error('meta_description')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                        <div class="form-text">Recommended: 150-160 characters</div>
+                                    </div>
+
+                                    <div class="mb-0">
+                                        <label for="keywords" class="form-label">Keywords</label>
+                                        <input type="text"
+                                            class="form-control @error('keywords') is-invalid @enderror" id="keywords"
+                                            name="keywords" value="{{ old('keywords', $package->keywords) }}"
+                                            placeholder="keyword1, keyword2, keyword3">
+                                        @error('keywords')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
                                     </div>
                                 </div>
                             </div>
@@ -215,209 +451,24 @@
                 </div>
             </div>
 
-            <!-- Images Tab -->
-            <div class="tab-pane fade" id="images" role="tabpanel">
-                <div class="row">
-                    <div class="col-lg-6">
-                        <div class="card mb-3">
-                            <div class="card-header">
-                                <h5 class="card-title mb-0">Featured Image</h5>
-                            </div>
-                            <div class="card-body text-center">
-                                <div class="image-preview mb-3" style="min-height: 250px; border: 2px dashed #ddd; display: flex; align-items: center; justify-content: center;">
-                                    @if($package->featured_image)
-                                        <img id="image-preview" src="{{ asset('storage/' . $package->featured_image) }}" alt="Preview" style="max-width: 100%; max-height: 250px;">
-                                    @else
-                                        <img id="image-preview" src="#" alt="Preview" style="max-width: 100%; max-height: 250px; display: none;">
-                                        <div id="image-placeholder" class="text-muted">
-                                            <i class="ri-image-line" style="font-size: 48px;"></i>
-                                            <p class="mt-2">Upload featured image</p>
-                                        </div>
-                                    @endif
-                                </div>
-                                <input type="file" class="form-control @error('featured_image') is-invalid @enderror"
-                                       id="featured_image" name="featured_image" accept="image/*" onchange="previewImage(event)">
-                                @error('featured_image')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                                <div class="form-text">Max file size: 5MB. Recommended: 1200x800px</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-6">
-                        <div class="card mb-3">
-                            <div class="card-header d-flex justify-content-between align-items-center">
-                                <h5 class="card-title mb-0">Gallery Images</h5>
-                                <button type="button" class="btn btn-sm btn-primary" onclick="addGalleryImage()">
-                                    <i class="ri-add-line"></i> Add Image
-                                </button>
-                            </div>
-                            <div class="card-body">
-                                <div id="gallery-container"></div>
-                                <div class="form-text">Recommended: 1200x800px, Max 2MB per image</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Itinerary Tab -->
-            <div class="tab-pane fade" id="itinerary" role="tabpanel">
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="card-title mb-0">Itinerary</h5>
-                        <button type="button" class="btn btn-sm btn-primary" onclick="addItineraryDay()">
-                            <i class="ri-add-line"></i> Add Day
+            <!-- Action Buttons -->
+            <div class="action-buttons-fixed">
+                <div class="container-fluid">
+                    <div class="d-flex gap-2 justify-content-end">
+                        <a href="{{ route('admin.packages.index') }}" class="btn btn-secondary">
+                            <i class="ri-arrow-left-line"></i> Cancel
+                        </a>
+                        <button type="button" class="btn btn-outline-secondary" onclick="saveDraft()">
+                            <i class="ri-draft-line"></i> Save as Draft
+                        </button>
+                        <button type="submit" class="btn btn-success">
+                            <i class="ri-save-line"></i> Update Package
                         </button>
                     </div>
-                    <div class="card-body">
-                        <div id="itinerary-container"></div>
-                    </div>
                 </div>
             </div>
-
-            <!-- Inclusions & Exclusions Tab -->
-            <div class="tab-pane fade" id="inclusions" role="tabpanel">
-                <div class="row">
-                    <div class="col-lg-6">
-                        <div class="card">
-                            <div class="card-header d-flex justify-content-between align-items-center">
-                                <h5 class="card-title mb-0">What's Included</h5>
-                                <button type="button" class="btn btn-sm btn-success" onclick="addInclusion()">
-                                    <i class="ri-add-line"></i> Add
-                                </button>
-                            </div>
-                            <div class="card-body">
-                                <div id="inclusions-container"></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-6">
-                        <div class="card">
-                            <div class="card-header d-flex justify-content-between align-items-center">
-                                <h5 class="card-title mb-0">What's Not Included</h5>
-                                <button type="button" class="btn btn-sm btn-danger" onclick="addExclusion()">
-                                    <i class="ri-add-line"></i> Add
-                                </button>
-                            </div>
-                            <div class="card-body">
-                                <div id="exclusions-container"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Settings & SEO Tab -->
-            <div class="tab-pane fade" id="settings" role="tabpanel">
-                <div class="row">
-                    <div class="col-lg-4">
-                        <div class="card mb-3">
-                            <div class="card-header">
-                                <h5 class="card-title mb-0"><i class="ri-price-tag-3-line"></i> Tags</h5>
-                            </div>
-                            <div class="card-body">
-                                <label for="tags" class="form-label">Select Tags</label>
-                                <select id="tags" name="tags[]" class="form-select" multiple>
-                                    @if(isset($tags) && $tags->count() > 0)
-                                        @foreach($tags as $type => $typeTags)
-                                            <optgroup label="{{ ucfirst($type) }}">
-                                                @foreach($typeTags as $tag)
-                                                    <option value="{{ $tag->id }}" 
-                                                        {{ collect(old('tags', $package->tags->pluck('id')->toArray()))->contains($tag->id) ? 'selected' : '' }}>
-                                                        {{ $tag->emoji ?? '' }} {{ $tag->name }}
-                                                    </option>
-                                                @endforeach
-                                            </optgroup>
-                                        @endforeach
-                                    @endif
-                                </select>
-                                <div class="form-text">Select multiple tags</div>
-                            </div>
-                        </div>
-                        <!-- Settings -->
-                        <div class="card">
-                            <div class="card-header">
-                                <h5 class="card-title mb-0">Settings</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="mb-3">
-                                    <label for="status" class="form-label">Status</label>
-                                    <select class="form-select @error('status') is-invalid @enderror" id="status" name="status">
-                                        <option value="draft" {{ old('status', $package->status) === 'draft' ? 'selected' : '' }}>Draft</option>
-                                        <option value="active" {{ old('status', $package->status) === 'active' ? 'selected' : '' }}>Active</option>
-                                        <option value="inactive" {{ old('status', $package->status) === 'inactive' ? 'selected' : '' }}>Inactive</option>
-                                    </select>
-                                    @error('status')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-8">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5 class="card-title mb-0"><i class="ri-search-line"></i> SEO Settings</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="mb-3">
-                                    <label for="meta_title" class="form-label">Meta Title</label>
-                                    <input type="text" class="form-control @error('meta_title') is-invalid @enderror"
-                                           id="meta_title" name="meta_title" value="{{ old('meta_title', $package->meta_title) }}" maxlength="60">
-                                    @error('meta_title')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                    <div class="form-text">Recommended: 50-60 characters</div>
-                                </div>
-
-                                <div class="mb-3">
-                                    <label for="meta_description" class="form-label">Meta Description</label>
-                                    <textarea class="form-control @error('meta_description') is-invalid @enderror"
-                                              id="meta_description" name="meta_description" rows="3" maxlength="160">{{ old('meta_description', $package->meta_description) }}</textarea>
-                                    @error('meta_description')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                    <div class="form-text">Recommended: 150-160 characters</div>
-                                </div>
-
-                                <div class="mb-0">
-                                    <label for="keywords" class="form-label">Keywords</label>
-                                    <input type="text" class="form-control @error('keywords') is-invalid @enderror"
-                                           id="keywords" name="keywords" value="{{ old('keywords', $package->keywords) }}"
-                                           placeholder="keyword1, keyword2, keyword3">
-                                    @error('keywords')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Action Buttons -->
-        <div class="action-buttons-fixed">
-            <div class="container-fluid">
-                <div class="d-flex gap-2 justify-content-end">
-                    <a href="{{ route('admin.packages.index') }}" class="btn btn-secondary">
-                        <i class="ri-arrow-left-line"></i> Cancel
-                    </a>
-                    <button type="button" class="btn btn-outline-secondary" onclick="saveDraft()">
-                        <i class="ri-draft-line"></i> Save as Draft
-                    </button>
-                    <button type="submit" class="btn btn-success">
-                        <i class="ri-save-line"></i> Update Package
-                    </button>
-                </div>
-            </div>
-        </div>
-    </form>
-</div>
+        </form>
+    </div>
 @endsection
 
 @push('styles')
@@ -431,7 +482,6 @@
     border-color: #dee2e6;
 }
 
-/* Fixed Bottom Action Buttons */
 .action-buttons-fixed {
     position: fixed;
     bottom: 0;
@@ -450,7 +500,6 @@
     }
 }
 
-/* Add padding to bottom of content to prevent overlap */
 body {
     padding-bottom: 80px;
 }
@@ -542,34 +591,29 @@ function previewGalleryImage(event, imageId) {
 let dayCounter = 0;
 function addItineraryDay() {
     const container = document.getElementById('itinerary-container');
-    // Recalculate day number based on existing days
     const existingDays = container.querySelectorAll('.border.rounded.p-3.mb-3');
     dayCounter = existingDays.length + 1;
     const dayHtml = `
         <div class="border rounded p-3 mb-3" id="day-${dayCounter}">
-            <div class="d-flex justify-content-between align-items-center mb-2">
+            <div class="d-flex justify-content-between align-items-center mb-3">
                 <h6 class="mb-0">Day ${dayCounter}</h6>
-                <div>
-                    <button type="button" class="btn btn-sm btn-outline-primary me-1" onclick="addDayItem(${dayCounter})">
+                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeDay(${dayCounter})">
+                    <i class="ri-delete-bin-line"></i> Remove Day
+                </button>
+            </div>
+            <div class="mb-3">
+                <input type="text" class="form-control" name="itinerary[${dayCounter}][day_title]" placeholder="Day title/description (e.g. NORTH-WEST SIDE AND EAST SIDE)">
+            </div>
+            <div class="mb-2">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <label class="form-label mb-0"><strong>Items:</strong></label>
+                    <button type="button" class="btn btn-sm btn-outline-primary" onclick="addDayItem(${dayCounter})">
                         <i class="ri-add-line"></i> Add Item
                     </button>
-                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeDay(${dayCounter})">
-                        <i class="ri-delete-bin-line"></i>
-                    </button>
                 </div>
-            </div>
-            <div id="day-${dayCounter}-items">
-                <div class="item-group mb-2" id="day-${dayCounter}-item-0">
-                    <div class="mb-2">
-                        <input type="text" class="form-control form-control-sm"
-                               name="itinerary[${dayCounter}][0][title]"
-                               placeholder="Activity title">
-                    </div>
-                    <div>
-                        <textarea class="form-control form-control-sm"
-                                  name="itinerary[${dayCounter}][0][description]"
-                                  rows="2"
-                                  placeholder="Activity description"></textarea>
+                <div id="day-${dayCounter}-items" class="ms-4">
+                    <div class="item-group mb-2" id="day-${dayCounter}-item-0">
+                        <input type="text" class="form-control form-control-sm" name="itinerary[${dayCounter}][items][0][title]" placeholder="Item 1">
                     </div>
                 </div>
             </div>
@@ -583,25 +627,13 @@ function addDayItem(dayId) {
     const itemsContainer = document.getElementById(`day-${dayId}-items`);
     const currentItems = itemsContainer.querySelectorAll('.item-group');
     const newItemIndex = currentItems.length;
-    
     const itemHtml = `
         <div class="item-group mb-2" id="day-${dayId}-item-${newItemIndex}">
-            <div class="d-flex justify-content-between align-items-center mb-1">
-                <small class="text-muted">Item ${newItemIndex + 1}</small>
-                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeDayItem(${dayId}, ${newItemIndex})">
+            <div class="input-group input-group-sm">
+                <input type="text" class="form-control" name="itinerary[${dayId}][items][${newItemIndex}][title]" placeholder="Item ${newItemIndex + 1}">
+                <button type="button" class="btn btn-outline-danger" onclick="removeDayItem(${dayId}, ${newItemIndex})">
                     <i class="ri-delete-bin-line"></i>
                 </button>
-            </div>
-            <div class="mb-2">
-                <input type="text" class="form-control form-control-sm"
-                       name="itinerary[${dayId}][${newItemIndex}][title]"
-                       placeholder="Activity title">
-            </div>
-            <div>
-                <textarea class="form-control form-control-sm"
-                          name="itinerary[${dayId}][${newItemIndex}][description]"
-                          rows="2"
-                          placeholder="Activity description"></textarea>
             </div>
         </div>
     `;
@@ -662,139 +694,159 @@ function removeExclusion(id) {
     document.getElementById(`exclusion-${id}`).remove();
 }
 
+// Character counter function
+function addCharacterCounter(inputId, maxLength) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+
+    const parent = input.parentElement;
+    const counter = document.createElement('div');
+    counter.className = 'form-text text-end';
+    counter.innerHTML = `<span id="${inputId}-count">0</span>/${maxLength}`;
+    parent.appendChild(counter);
+
+    input.addEventListener('input', function() {
+        const count = this.value.length;
+        document.getElementById(`${inputId}-count`).textContent = count;
+        counter.classList.remove('text-warning', 'text-danger');
+        if (count > maxLength * 0.8) {
+            counter.classList.add('text-warning');
+        }
+        if (count > maxLength * 0.95) {
+            counter.classList.add('text-danger');
+        }
+    });
+}
+
 // Initialize with first items or load existing data
 document.addEventListener('DOMContentLoaded', function() {
-    // Check if we have old input (from validation errors)
+    const container = document.getElementById('itinerary-container');
     const oldItinerary = @json(old('itinerary', []));
     const hasOldData = Object.keys(oldItinerary).length > 0;
-    
+
     if (hasOldData) {
-        // Restore from old() data (validation error scenario)
-        console.log('Restoring from old() data');
         Object.keys(oldItinerary).forEach(function(dayNum) {
             dayCounter++;
-            const items = oldItinerary[dayNum];
-            const dayHtml = document.createElement('div');
-            dayHtml.className = 'border rounded p-3 mb-3';
-            dayHtml.id = 'day-' + dayCounter;
-            
-            let itemsHtml = '';
-            Object.keys(items).forEach(function(itemIdx) {
-                const item = items[itemIdx];
-                itemsHtml += `
-                    <div class="item-group mb-2" id="day-${dayCounter}-item-${itemIdx}">
-                        <div class="d-flex justify-content-between align-items-center mb-1">
-                            <small class="text-muted">Item ${parseInt(itemIdx) + 1}</small>
-                            ${itemIdx > 0 ? `<button type="button" class="btn btn-sm btn-outline-danger" onclick="removeDayItem(${dayCounter}, ${itemIdx})"><i class="ri-delete-bin-line"></i></button>` : ''}
-                        </div>
-                        <div class="mb-2">
-                            <input type="text" class="form-control form-control-sm"
-                                   name="itinerary[${dayCounter}][${itemIdx}][title]"
-                                   value="${item.title || ''}"
-                                   placeholder="Activity title">
-                        </div>
-                        <div>
-                            <textarea class="form-control form-control-sm"
-                                      name="itinerary[${dayCounter}][${itemIdx}][description]"
-                                      rows="2"
-                                      placeholder="Activity description">${item.description || ''}</textarea>
-                        </div>
-                    </div>
-                `;
-            });
-            
-            dayHtml.innerHTML = `
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <h6 class="mb-0">Day ${dayCounter}</h6>
-                    <div>
-                        <button type="button" class="btn btn-sm btn-outline-primary me-1" onclick="addDayItem(${dayCounter})">
-                            <i class="ri-add-line"></i> Add Item
-                        </button>
-                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeDay(${dayCounter})">
-                            <i class="ri-delete-bin-line"></i>
-                        </button>
-                    </div>
-                </div>
-                <div id="day-${dayCounter}-items">
-                    ${itemsHtml}
-                </div>
-            `;
-            document.getElementById('itinerary-container').appendChild(dayHtml);
-        });
-    } else {
-        // Load from database (normal edit scenario)
-        const itinerariesRaw = {!! json_encode($package->itineraries ?? []) !!} || [];
-        
-        // Group itineraries by day_number
-        const itineraryByDay = {};
-        itinerariesRaw.forEach(function(item) {
-            if (!itineraryByDay[item.day_number]) {
-                itineraryByDay[item.day_number] = [];
-            }
-            itineraryByDay[item.day_number].push(item);
-        });
+            const dayData = oldItinerary[dayNum] || {};
+            const dayTitle = dayData.day_title || '';
+            const items = dayData.items || {};
 
-        // Load itinerary data grouped by day
-        if (Object.keys(itineraryByDay).length > 0) {
-            Object.keys(itineraryByDay).sort((a, b) => a - b).forEach(function(dayNum) {
-                const items = itineraryByDay[dayNum];
-                dayCounter++;
-                const dayHtml = document.createElement('div');
-                dayHtml.className = 'border rounded p-3 mb-3';
-                dayHtml.id = 'day-' + dayCounter;
-                
-                let itemsHtml = '';
-                items.forEach(function(item, idx) {
+            let itemsHtml = '';
+            const itemKeys = Object.keys(items);
+            if (itemKeys.length > 0) {
+                itemKeys.forEach(function(itemIdx) {
+                    const item = items[itemIdx] || {};
                     itemsHtml += `
-                        <div class="item-group mb-2" id="day-${dayCounter}-item-${idx}">
-                            <div class="d-flex justify-content-between align-items-center mb-1">
-                                <small class="text-muted">Item ${idx + 1}</small>
-                                ${idx > 0 ? `<button type="button" class="btn btn-sm btn-outline-danger" onclick="removeDayItem(${dayCounter}, ${idx})"><i class="ri-delete-bin-line"></i></button>` : ''}
-                            </div>
-                            <div class="mb-2">
-                                <input type="text" class="form-control form-control-sm"
-                                       name="itinerary[${dayCounter}][${idx}][title]"
-                                       value="${item.title || ''}"
-                                       placeholder="Activity title">
-                            </div>
-                            <div>
-                                <textarea class="form-control form-control-sm"
-                                          name="itinerary[${dayCounter}][${idx}][description]"
-                                          rows="2"
-                                          placeholder="Activity description">${item.description || ''}</textarea>
+                        <div class="item-group mb-2" id="day-${dayCounter}-item-${itemIdx}">
+                            <div class="input-group input-group-sm">
+                                <input type="text" class="form-control" name="itinerary[${dayCounter}][items][${itemIdx}][title]" value="${item.title || ''}" placeholder="Item ${parseInt(itemIdx, 10) + 1}">
+                                <button type="button" class="btn btn-outline-danger" onclick="removeDayItem(${dayCounter}, ${itemIdx})">
+                                    <i class="ri-delete-bin-line"></i>
+                                </button>
                             </div>
                         </div>
                     `;
                 });
-                
-                dayHtml.innerHTML = `
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <h6 class="mb-0">Day ${dayCounter}</h6>
-                        <div>
-                            <button type="button" class="btn btn-sm btn-outline-primary me-1" onclick="addDayItem(${dayCounter})">
-                                <i class="ri-add-line"></i> Add Item
-                            </button>
-                            <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeDay(${dayCounter})">
-                                <i class="ri-delete-bin-line"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div id="day-${dayCounter}-items">
-                        ${itemsHtml}
+            } else {
+                itemsHtml = `
+                    <div class="item-group mb-2" id="day-${dayCounter}-item-0">
+                        <input type="text" class="form-control form-control-sm" name="itinerary[${dayCounter}][items][0][title]" placeholder="Item 1">
                     </div>
                 `;
-                document.getElementById('itinerary-container').appendChild(dayHtml);
+            }
+
+            const dayHtml = `
+                <div class="border rounded p-3 mb-3" id="day-${dayCounter}">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="mb-0">Day ${dayCounter}</h6>
+                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeDay(${dayCounter})">
+                            <i class="ri-delete-bin-line"></i> Remove Day
+                        </button>
+                    </div>
+                    <div class="mb-3">
+                        <input type="text" class="form-control" name="itinerary[${dayCounter}][day_title]" value="${dayTitle}" placeholder="Day title/description (e.g. NORTH-WEST SIDE AND EAST SIDE)">
+                    </div>
+                    <div class="mb-2">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <label class="form-label mb-0"><strong>Items:</strong></label>
+                            <button type="button" class="btn btn-sm btn-outline-primary" onclick="addDayItem(${dayCounter})">
+                                <i class="ri-add-line"></i> Add Item
+                            </button>
+                        </div>
+                        <div id="day-${dayCounter}-items" class="ms-4">
+                            ${itemsHtml}
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', dayHtml);
+        });
+    } else {
+        const itinerariesRaw = {!! json_encode($package->itineraries ?? []) !!} || [];
+        if (itinerariesRaw.length > 0) {
+            itinerariesRaw.forEach(function(itinerary) {
+                dayCounter++;
+                const displayDayNumber = itinerary.day_number || dayCounter;
+                const dayTitle = itinerary.day_title || '';
+                const items = itinerary.items || [];
+
+                let itemsHtml = '';
+                if (items.length > 0) {
+                    items.forEach(function(item, idx) {
+                        itemsHtml += `
+                            <div class="item-group mb-2" id="day-${dayCounter}-item-${idx}">
+                                <div class="input-group input-group-sm">
+                                    <input type="text" class="form-control" name="itinerary[${dayCounter}][items][${idx}][title]" value="${item.title || ''}" placeholder="Item ${idx + 1}">
+                                    <button type="button" class="btn btn-outline-danger" onclick="removeDayItem(${dayCounter}, ${idx})">
+                                        <i class="ri-delete-bin-line"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                } else {
+                    itemsHtml = `
+                        <div class="item-group mb-2" id="day-${dayCounter}-item-0">
+                            <input type="text" class="form-control form-control-sm" name="itinerary[${dayCounter}][items][0][title]" placeholder="Item 1">
+                        </div>
+                    `;
+                }
+
+                const dayHtml = `
+                    <div class="border rounded p-3 mb-3" id="day-${dayCounter}">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h6 class="mb-0">Day ${displayDayNumber}</h6>
+                            <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeDay(${dayCounter})">
+                                <i class="ri-delete-bin-line"></i> Remove Day
+                            </button>
+                        </div>
+                        <div class="mb-3">
+                            <input type="text" class="form-control" name="itinerary[${dayCounter}][day_title]" value="${dayTitle}" placeholder="Day title/description (e.g. NORTH-WEST SIDE AND EAST SIDE)">
+                        </div>
+                        <div class="mb-2">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <label class="form-label mb-0"><strong>Items:</strong></label>
+                                <button type="button" class="btn btn-sm btn-outline-primary" onclick="addDayItem(${dayCounter})">
+                                    <i class="ri-add-line"></i> Add Item
+                                </button>
+                            </div>
+                            <div id="day-${dayCounter}-items" class="ms-4">
+                                ${itemsHtml}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.insertAdjacentHTML('beforeend', dayHtml);
             });
         } else {
             addItineraryDay();
         }
     }
 
-    // Load inclusions with old() support
-    const inclusionData = {!! json_encode(old('inclusions') ?? $package->inclusions->pluck('description') ?? []) !!} || [];
-    const exclusionData = {!! json_encode(old('exclusions') ?? $package->exclusions->pluck('description') ?? []) !!} || [];
+    const inclusionData = {!! json_encode(old('inclusions') ?? ($package->inclusions->pluck('description') ?? [])) !!} || [];
+    const exclusionData = {!! json_encode(old('exclusions') ?? ($package->exclusions->pluck('description') ?? [])) !!} || [];
     const galleryData = {!! json_encode($package->galleries ?? []) !!} || [];
-    
+
     if (Array.isArray(inclusionData) && inclusionData.length > 0) {
         inclusionData.forEach(function(inclusion) {
             inclusionCounter++;
@@ -860,14 +912,12 @@ document.addEventListener('DOMContentLoaded', function() {
 // Remove existing gallery image (mark for deletion)
 function removeExistingGallery(galleryId, dbId) {
     const galleryDiv = document.getElementById(`gallery-${galleryId}`);
-    // Add hidden input to mark for deletion
     const form = document.getElementById('packageForm');
     const deleteInput = document.createElement('input');
     deleteInput.type = 'hidden';
     deleteInput.name = 'delete_galleries[]';
     deleteInput.value = dbId;
     form.appendChild(deleteInput);
-    // Remove from DOM
     galleryDiv.remove();
 }
 
@@ -881,8 +931,6 @@ function saveDraft() {
 document.getElementById('packageForm').addEventListener('submit', function(e) {
     const formData = new FormData(this);
     console.log('=== FORM SUBMISSION DEBUG ===');
-    
-    // Log itinerary data
     const itineraryData = {};
     for (let [key, value] of formData.entries()) {
         if (key.startsWith('itinerary[')) {
@@ -890,12 +938,8 @@ document.getElementById('packageForm').addEventListener('submit', function(e) {
             itineraryData[key] = value;
         }
     }
-    
     console.log('Total itinerary fields:', Object.keys(itineraryData).length);
     console.log('=== END DEBUG ===');
-    
-    // Allow form to submit normally
-    // Remove the e.preventDefault() to let form submit
 });
 
 // Auto-generate meta title from name
@@ -906,33 +950,8 @@ document.getElementById('name').addEventListener('input', function() {
     }
 });
 
-// Character counter for meta fields
-function addCharacterCounter(inputId, maxLength) {
-    const input = document.getElementById(inputId);
-    if (!input) return;
-    
-    const parent = input.parentElement;
-    const counter = document.createElement('div');
-    counter.className = 'form-text text-end';
-    counter.innerHTML = `<span id="${inputId}-count">0</span>/${maxLength}`;
-    parent.appendChild(counter);
-
-    input.addEventListener('input', function() {
-        const count = this.value.length;
-        document.getElementById(`${inputId}-count`).textContent = count;
-        counter.classList.remove('text-warning', 'text-danger');
-        if (count > maxLength * 0.8) {
-            counter.classList.add('text-warning');
-        }
-        if (count > maxLength * 0.95) {
-            counter.classList.add('text-danger');
-        }
-    });
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-    addCharacterCounter('meta_title', 60);
-    addCharacterCounter('meta_description', 160);
-});
+// Initialize character counters
+addCharacterCounter('meta_title', 60);
+addCharacterCounter('meta_description', 160);
 </script>
 @endpush

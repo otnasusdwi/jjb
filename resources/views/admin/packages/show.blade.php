@@ -129,29 +129,23 @@
                     <h5 class="card-title mb-0">Itinerary</h5>
                 </div>
                 <div class="card-body" style="max-height: 500px; overflow-y: auto;">
-                    <div class="timeline">
-                        @php
-                            $groupedItineraries = $package->itineraries->groupBy('day_number')->sortKeys();
-                        @endphp
-                        @foreach($groupedItineraries as $dayNumber => $dayItems)
-                        <div class="timeline-item mb-4">
-                            <div class="timeline-marker">
-                                <span class="badge bg-primary">Day {{ $dayNumber }}</span>
-                            </div>
-                            <div class="timeline-content ps-3">
-                                @foreach($dayItems->sortBy('order') as $item)
-                                <div class="mb-3">
-                                    <h6 class="mb-1">{{ $item->title }}</h6>
-                                    <p class="mb-0 text-muted">{{ $item->description }}</p>
-                                </div>
-                                @if(!$loop->last)
-                                <hr class="my-2">
-                                @endif
-                                @endforeach
-                            </div>
-                        </div>
-                        @endforeach
+                    @foreach($package->itineraries as $itinerary)
+                    <div class="mb-3">
+                        <div class="fw-semibold mb-2">Day {{ $itinerary->day_number }}@if($itinerary->day_title) - {{ $itinerary->day_title }}@endif</div>
+                        @if($itinerary->items && $itinerary->items->count() > 0)
+                        <ul class="mb-0 ps-3">
+                            @foreach($itinerary->items as $item)
+                            <li class="mb-1">{{ $item->title }}</li>
+                            @endforeach
+                        </ul>
+                        @else
+                        <p class="text-muted mb-0">No items added for this day.</p>
+                        @endif
                     </div>
+                    @if(!$loop->last)
+                    <hr class="my-3">
+                    @endif
+                    @endforeach
                 </div>
             </div>
             @endif

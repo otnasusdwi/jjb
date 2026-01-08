@@ -72,7 +72,7 @@ class TravelPackage extends Model
     {
         return $this->hasMany(PackageItinerary::class, 'travel_package_id')
             ->orderBy('day_number')
-            ->orderBy('order');
+            ->with('items');
     }
 
     /**

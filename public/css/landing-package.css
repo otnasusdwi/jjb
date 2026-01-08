@@ -11,6 +11,16 @@
     content: '';
     position: absolute;
     top: 0;
+.tab-content-panel,
+.tab-content-panel h2,
+.tab-content-panel h3,
+.tab-content-panel h4,
+.tab-content-panel h5,
+.tab-content-panel h6,
+.tab-content-panel p,
+.tab-content-panel li {
+    font-family: 'Poppins', sans-serif;
+}
     left: 0;
     right: 0;
     bottom: 0;

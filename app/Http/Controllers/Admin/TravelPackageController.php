@@ -108,16 +108,23 @@ class TravelPackageController extends Controller
 
         $package->save();
 
-        // Handle itinerary - save to package_itineraries table
+        // Handle itinerary - save to package_itineraries table (parent-child structure)
         if ($request->has('itinerary') && is_array($request->itinerary)) {
-            foreach ($request->itinerary as $dayNumber => $items) {
-                if (is_array($items)) {
-                    foreach ($items as $order => $item) {
+            foreach ($request->itinerary as $dayNumber => $dayData) {
+                $dayTitle = isset($dayData['day_title']) ? $dayData['day_title'] : null;
+                
+                // Create parent day itinerary
+                $dayItinerary = $package->itineraries()->create([
+                    'day_number' => $dayNumber,
+                    'day_title' => $dayTitle,
+                ]);
+                
+                // Create child items for this day
+                if (isset($dayData['items']) && is_array($dayData['items'])) {
+                    foreach ($dayData['items'] as $order => $item) {
                         if (!empty($item['title'])) {
-                            $package->itineraries()->create([
-                                'day_number' => $dayNumber,
+                            $dayItinerary->items()->create([
                                 'title' => $item['title'],
-                                'description' => $item['description'] ?? '',
                                 'order' => $order,
                             ]);
                         }
@@ -163,7 +170,8 @@ class TravelPackageController extends Controller
 
     public function show(TravelPackage $package)
     {
-        $package->load(['bookings.user', 'tags']);
+        // Eager-load itinerary parents with their items for display
+        $package->load(['bookings.user', 'tags', 'itineraries.items']);
         return view('admin.packages.show', compact('package'));
     }
 
@@ -263,16 +271,23 @@ class TravelPackageController extends Controller
         $package->inclusions()->delete();
         $package->exclusions()->delete();
 
-        // Handle itinerary - save to package_itineraries table
+        // Handle itinerary - save to package_itineraries table (parent-child structure)
         if ($request->has('itinerary') && is_array($request->itinerary)) {
-            foreach ($request->itinerary as $dayNumber => $items) {
-                if (is_array($items)) {
-                    foreach ($items as $order => $item) {
+            foreach ($request->itinerary as $dayNumber => $dayData) {
+                $dayTitle = isset($dayData['day_title']) ? $dayData['day_title'] : null;
+                
+                // Create parent day itinerary
+                $dayItinerary = $package->itineraries()->create([
+                    'day_number' => $dayNumber,
+                    'day_title' => $dayTitle,
+                ]);
+                
+                // Create child items for this day
+                if (isset($dayData['items']) && is_array($dayData['items'])) {
+                    foreach ($dayData['items'] as $order => $item) {
                         if (!empty($item['title'])) {
-                            $package->itineraries()->create([
-                                'day_number' => $dayNumber,
+                            $dayItinerary->items()->create([
                                 'title' => $item['title'],
-                                'description' => $item['description'] ?? '',
                                 'order' => $order,
                             ]);
                         }

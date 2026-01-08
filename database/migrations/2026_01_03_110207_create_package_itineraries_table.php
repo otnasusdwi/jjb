@@ -15,11 +15,10 @@ return new class extends Migration
             $table->id();
             $table->foreignId('travel_package_id')->constrained('travel_packages')->onDelete('cascade');
             $table->integer('day_number');
-            $table->string('title');
-            $table->text('description')->nullable();
+            $table->string('day_title')->nullable(); // new: day description/title
+            $table->string('title'); // activity name
             $table->integer('order')->default(0);
             $table->timestamps();
-            
             $table->index(['travel_package_id', 'day_number', 'order']);
         });
     }

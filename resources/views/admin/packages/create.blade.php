@@ -525,34 +525,29 @@ function previewGalleryImage(event, imageId) {
 let dayCounter = 0;
 function addItineraryDay() {
     const container = document.getElementById('itinerary-container');
-    // Recalculate day number based on existing days
     const existingDays = container.querySelectorAll('.border.rounded.p-3.mb-3');
     dayCounter = existingDays.length + 1;
     const dayHtml = `
         <div class="border rounded p-3 mb-3" id="day-${dayCounter}">
-            <div class="d-flex justify-content-between align-items-center mb-2">
+            <div class="d-flex justify-content-between align-items-center mb-3">
                 <h6 class="mb-0">Day ${dayCounter}</h6>
-                <div>
-                    <button type="button" class="btn btn-sm btn-outline-primary me-1" onclick="addDayItem(${dayCounter})">
+                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeDay(${dayCounter})">
+                    <i class="ri-delete-bin-line"></i> Remove Day
+                </button>
+            </div>
+            <div class="mb-3">
+                <input type="text" class="form-control" name="itinerary[${dayCounter}][day_title]" placeholder="Day title/description (e.g. NORTH-WEST SIDE AND EAST SIDE)">
+            </div>
+            <div class="mb-2">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <label class="form-label mb-0"><strong>Items:</strong></label>
+                    <button type="button" class="btn btn-sm btn-outline-primary" onclick="addDayItem(${dayCounter})">
                         <i class="ri-add-line"></i> Add Item
                     </button>
-                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeDay(${dayCounter})">
-                        <i class="ri-delete-bin-line"></i>
-                    </button>
                 </div>
-            </div>
-            <div id="day-${dayCounter}-items">
-                <div class="item-group mb-2" id="day-${dayCounter}-item-0">
-                    <div class="mb-2">
-                        <input type="text" class="form-control form-control-sm"
-                               name="itinerary[${dayCounter}][0][title]"
-                               placeholder="Activity title">
-                    </div>
-                    <div>
-                        <textarea class="form-control form-control-sm"
-                                  name="itinerary[${dayCounter}][0][description]"
-                                  rows="2"
-                                  placeholder="Activity description"></textarea>
+                <div id="day-${dayCounter}-items" class="ms-4">
+                    <div class="item-group mb-2" id="day-${dayCounter}-item-0">
+                        <input type="text" class="form-control form-control-sm" name="itinerary[${dayCounter}][items][0][title]" placeholder="Item 1">
                     </div>
                 </div>
             </div>
@@ -566,25 +561,13 @@ function addDayItem(dayId) {
     const itemsContainer = document.getElementById(`day-${dayId}-items`);
     const currentItems = itemsContainer.querySelectorAll('.item-group');
     const newItemIndex = currentItems.length;
-    
     const itemHtml = `
         <div class="item-group mb-2" id="day-${dayId}-item-${newItemIndex}">
-            <div class="d-flex justify-content-between align-items-center mb-1">
-                <small class="text-muted">Item ${newItemIndex + 1}</small>
-                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeDayItem(${dayId}, ${newItemIndex})">
+            <div class="input-group input-group-sm">
+                <input type="text" class="form-control" name="itinerary[${dayId}][items][${newItemIndex}][title]" placeholder="Item ${newItemIndex + 1}">
+                <button type="button" class="btn btn-outline-danger" onclick="removeDayItem(${dayId}, ${newItemIndex})">
                     <i class="ri-delete-bin-line"></i>
                 </button>
-            </div>
-            <div class="mb-2">
-                <input type="text" class="form-control form-control-sm"
-                       name="itinerary[${dayId}][${newItemIndex}][title]"
-                       placeholder="Activity title">
-            </div>
-            <div>
-                <textarea class="form-control form-control-sm"
-                          name="itinerary[${dayId}][${newItemIndex}][description]"
-                          rows="2"
-                          placeholder="Activity description"></textarea>
             </div>
         </div>
     `;
