@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Tag;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Driver;
 
 class TagController extends Controller
 {
@@ -56,6 +58,8 @@ class TagController extends Controller
                 'sort_order' => 'nullable|integer|min:0',
                 'is_active' => 'boolean',
                 'gallery_images.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+                'gallery_images_data' => 'nullable|array',
+                'gallery_images_data.*' => 'nullable|string',
                 'gallery_captions.*' => 'nullable|string|max:255',
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
@@ -72,24 +76,18 @@ class TagController extends Controller
         ]);
 
         // Handle gallery images for destination type only
-        if ($request->type === 'destination' && $request->hasFile('gallery_images')) {
+        if ($request->type === 'destination') {
             $order = 0;
-            $files = $request->file('gallery_images');
             $captions = $request->input('gallery_captions', []);
-            
             $uploadedCount = 0;
             $failedFiles = [];
-            
-            foreach ($files as $index => $file) {
-                if ($file && $file->isValid()) {
+
+            // First process cropped base64 images
+            if ($request->has('gallery_images_data') && is_array($request->gallery_images_data)) {
+                foreach ($request->gallery_images_data as $index => $data) {
+                    if (!$data) continue;
                     try {
-                        // Validate individual file size
-                        if ($file->getSize() > 2048 * 1024) {
-                            $failedFiles[] = $file->getClientOriginalName() . ' (exceeds 2MB)';
-                            continue;
-                        }
-                        
-                        $imagePath = $file->store('tags/gallery', 'public');
+                        $imagePath = $this->saveBase64Image($data, 'tags/gallery');
                         $tag->galleries()->create([
                             'image_path' => $imagePath,
                             'caption' => $captions[$index] ?? null,
@@ -97,9 +95,34 @@ class TagController extends Controller
                         ]);
                         $uploadedCount++;
                     } catch (\Exception $e) {
-                        \Log::error('Failed to upload gallery image: ' . $e->getMessage());
-                        $failedFiles[] = $file->getClientOriginalName();
+                        \Log::error('Failed to save base64 gallery image: ' . $e->getMessage());
                         continue;
+                    }
+                }
+            }
+
+            // Then process regular file uploads
+            if ($request->hasFile('gallery_images')) {
+                $files = $request->file('gallery_images');
+                foreach ($files as $index => $file) {
+                    if ($file && $file->isValid()) {
+                        try {
+                            if ($file->getSize() > 2048 * 1024) {
+                                $failedFiles[] = $file->getClientOriginalName() . ' (exceeds 2MB)';
+                                continue;
+                            }
+                            $imagePath = $file->store('tags/gallery', 'public');
+                            $tag->galleries()->create([
+                                'image_path' => $imagePath,
+                                'caption' => $captions[$index] ?? null,
+                                'order' => $order++,
+                            ]);
+                            $uploadedCount++;
+                        } catch (\Exception $e) {
+                            \Log::error('Failed to upload gallery image: ' . $e->getMessage());
+                            $failedFiles[] = $file->getClientOriginalName();
+                            continue;
+                        }
                     }
                 }
             }
@@ -165,6 +188,8 @@ class TagController extends Controller
                 'sort_order' => 'nullable|integer|min:0',
                 'is_active' => 'boolean',
                 'gallery_images.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+                'gallery_images_data' => 'nullable|array',
+                'gallery_images_data.*' => 'nullable|string',
                 'gallery_captions.*' => 'nullable|string|max:255',
                 'existing_gallery_captions.*' => 'nullable|string|max:255',
             ]);
@@ -203,24 +228,17 @@ class TagController extends Controller
         }
 
         // Handle new gallery images for destination type only
-        if ($request->type === 'destination' && $request->hasFile('gallery_images')) {
+        if ($request->type === 'destination') {
             $order = $tag->galleries()->count();
-            $files = $request->file('gallery_images');
             $captions = $request->input('gallery_captions', []);
-            
             $uploadedCount = 0;
             $failedFiles = [];
-            
-            foreach ($files as $index => $file) {
-                if ($file && $file->isValid()) {
+
+            if ($request->has('gallery_images_data') && is_array($request->gallery_images_data)) {
+                foreach ($request->gallery_images_data as $index => $data) {
+                    if (!$data) continue;
                     try {
-                        // Validate individual file size
-                        if ($file->getSize() > 2048 * 1024) {
-                            $failedFiles[] = $file->getClientOriginalName() . ' (exceeds 2MB)';
-                            continue;
-                        }
-                        
-                        $imagePath = $file->store('tags/gallery', 'public');
+                        $imagePath = $this->saveBase64Image($data, 'tags/gallery');
                         $tag->galleries()->create([
                             'image_path' => $imagePath,
                             'caption' => $captions[$index] ?? null,
@@ -228,9 +246,33 @@ class TagController extends Controller
                         ]);
                         $uploadedCount++;
                     } catch (\Exception $e) {
-                        \Log::error('Failed to upload gallery image: ' . $e->getMessage());
-                        $failedFiles[] = $file->getClientOriginalName();
+                        \Log::error('Failed to save base64 gallery image: ' . $e->getMessage());
                         continue;
+                    }
+                }
+            }
+
+            if ($request->hasFile('gallery_images')) {
+                $files = $request->file('gallery_images');
+                foreach ($files as $index => $file) {
+                    if ($file && $file->isValid()) {
+                        try {
+                            if ($file->getSize() > 2048 * 1024) {
+                                $failedFiles[] = $file->getClientOriginalName() . ' (exceeds 2MB)';
+                                continue;
+                            }
+                            $imagePath = $file->store('tags/gallery', 'public');
+                            $tag->galleries()->create([
+                                'image_path' => $imagePath,
+                                'caption' => $captions[$index] ?? null,
+                                'order' => $order++,
+                            ]);
+                            $uploadedCount++;
+                        } catch (\Exception $e) {
+                            \Log::error('Failed to upload gallery image: ' . $e->getMessage());
+                            $failedFiles[] = $file->getClientOriginalName();
+                            continue;
+                        }
                     }
                 }
             }
@@ -303,5 +345,20 @@ class TagController extends Controller
         $gallery->delete();
 
         return response()->json(['success' => true, 'message' => 'Image deleted successfully']);
+    }
+
+    private function saveBase64Image(string $data, string $directory, int $quality = 80): string
+    {
+        if (str_contains($data, ',')) {
+            $data = explode(',', $data, 2)[1];
+        }
+        $binary = base64_decode($data);
+        $manager = new ImageManager(new Driver());
+        $image = $manager->read($binary);
+        $encoded = $image->encodeByExtension('jpg', quality: $quality);
+        $filename = uniqid('tag_') . '.jpg';
+        $path = trim($directory, '/') . '/' . $filename;
+        Storage::disk('public')->put($path, (string) $encoded);
+        return $path;
     }
 }

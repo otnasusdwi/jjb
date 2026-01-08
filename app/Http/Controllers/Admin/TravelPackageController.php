@@ -8,6 +8,8 @@ use App\Models\PackageCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Driver;
 
 class TravelPackageController extends Controller
 {
@@ -54,6 +56,9 @@ class TravelPackageController extends Controller
             'child_price' => 'nullable|numeric|min:0',
             'featured_image' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
             'gallery_images.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'featured_image_data' => 'nullable|string',
+            'gallery_images_data' => 'nullable|array',
+            'gallery_images_data.*' => 'nullable|string',
             'itinerary' => 'nullable|array',
             'inclusions' => 'nullable|array',
             'inclusions.*' => 'string|max:255',
@@ -86,15 +91,28 @@ class TravelPackageController extends Controller
         $package->meta_description = $request->meta_description;
         $package->keywords = $request->keywords;
 
-        // Handle featured image upload
-        if ($request->hasFile('featured_image')) {
+        // Handle featured image upload or cropped data
+        if ($request->filled('featured_image_data')) {
+            $package->featured_image = $this->saveBase64Image($request->featured_image_data, 'packages');
+        } elseif ($request->hasFile('featured_image')) {
             $imagePath = $request->file('featured_image')->store('packages', 'public');
             $package->featured_image = $imagePath;
         }
 
-        // Handle gallery images
+        // Handle gallery images (cropped data first)
+        $order = 0;
+        if ($request->has('gallery_images_data') && is_array($request->gallery_images_data)) {
+            foreach ($request->gallery_images_data as $data) {
+                if ($data) {
+                    $imagePath = $this->saveBase64Image($data, 'packages/gallery');
+                    $package->galleries()->create([
+                        'image_path' => $imagePath,
+                        'order' => $order++,
+                    ]);
+                }
+            }
+        }
         if ($request->hasFile('gallery_images')) {
-            $order = 0;
             foreach ($request->file('gallery_images') as $file) {
                 if ($file && $file->isValid()) {
                     $imagePath = $file->store('packages/gallery', 'public');
@@ -198,6 +216,9 @@ class TravelPackageController extends Controller
             'child_price' => 'nullable|numeric|min:0',
             'featured_image' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
             'gallery_images.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'featured_image_data' => 'nullable|string',
+            'gallery_images_data' => 'nullable|array',
+            'gallery_images_data.*' => 'nullable|string',
             'itinerary' => 'nullable|array',
             'inclusions' => 'nullable|array',
             'inclusions.*' => 'string|max:255',
@@ -229,8 +250,13 @@ class TravelPackageController extends Controller
         $package->meta_description = $request->meta_description;
         $package->keywords = $request->keywords;
 
-        // Handle featured image upload
-        if ($request->hasFile('featured_image')) {
+        // Handle featured image upload or cropped data
+        if ($request->filled('featured_image_data')) {
+            if ($package->featured_image) {
+                Storage::disk('public')->delete($package->featured_image);
+            }
+            $package->featured_image = $this->saveBase64Image($request->featured_image_data, 'packages');
+        } elseif ($request->hasFile('featured_image')) {
             // Delete old image
             if ($package->featured_image) {
                 Storage::disk('public')->delete($package->featured_image);
@@ -250,9 +276,20 @@ class TravelPackageController extends Controller
             }
         }
 
-        // Handle new gallery images
+        // Handle new gallery images (cropped data first)
+        $order = $package->galleries()->count();
+        if ($request->has('gallery_images_data') && is_array($request->gallery_images_data)) {
+            foreach ($request->gallery_images_data as $data) {
+                if ($data) {
+                    $imagePath = $this->saveBase64Image($data, 'packages/gallery');
+                    $package->galleries()->create([
+                        'image_path' => $imagePath,
+                        'order' => $order++,
+                    ]);
+                }
+            }
+        }
         if ($request->hasFile('gallery_images')) {
-            $order = $package->galleries()->count(); // Continue from existing count
             foreach ($request->file('gallery_images') as $file) {
                 if ($file && $file->isValid()) {
                     $imagePath = $file->store('packages/gallery', 'public');
@@ -400,5 +437,23 @@ class TravelPackageController extends Controller
 
         return redirect()->route('admin.packages.index')
             ->with('success', $message);
+    }
+
+    /**
+     * Save base64 image string to storage with compression.
+     */
+    private function saveBase64Image(string $data, string $directory, int $quality = 80): string
+    {
+        if (str_contains($data, ',')) {
+            $data = explode(',', $data, 2)[1];
+        }
+        $binary = base64_decode($data);
+        $manager = new ImageManager(new Driver());
+        $image = $manager->read($binary);
+        $encoded = $image->encodeByExtension('jpg', quality: $quality);
+        $filename = uniqid('img_') . '.jpg';
+        $path = trim($directory, '/') . '/' . $filename;
+        Storage::disk('public')->put($path, (string) $encoded);
+        return $path;
     }
 }

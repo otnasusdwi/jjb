@@ -2,6 +2,16 @@
 
 @section('title', 'Edit Tag')
 
+@push('styles')
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
+<style>
+.crop-modal .modal-dialog { max-width: 800px; }
+.crop-container { max-height: 500px; overflow: hidden; }
+.crop-container img { max-width: 100%; display: block; }
+.aspect-ratio-btns .btn { margin: 0 5px; }
+</style>
+@endpush
+
 @section('content')
 <div class="page-title-box">
     <div class="row align-items-center">
@@ -42,7 +52,7 @@
                     </div>
                 @endif
 
-                <form action="{{ route('admin.tags.update', $tag) }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('admin.tags.update', $tag) }}" method="POST" enctype="multipart/form-data" id="tagForm">
                     @csrf
                     @method('PUT')
 
@@ -332,9 +342,11 @@ function addGalleryImage() {
             <div class="mb-2">
                 <label class="form-label">Image File</label>
                 <input type="file" class="form-control form-control-sm" 
-                       name="gallery_images[]" 
+                       id="gallery-file-${galleryCounter}"
+                       data-gallery-id="${galleryCounter}"
                        accept="image/*"
-                       onchange="previewGalleryImage(event, ${galleryCounter})">
+                       onchange="openCropModal(event, 'gallery', ${galleryCounter})">
+                <input type="hidden" name="gallery_images_data[]" id="gallery-data-${galleryCounter}">
             </div>
             <div class="mb-2">
                 <label class="form-label">Caption (Optional)</label>
@@ -460,6 +472,113 @@ document.addEventListener('DOMContentLoaded', function() {
     const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
     if (confirmDeleteBtn) {
         confirmDeleteBtn.addEventListener('click', deleteGalleryViaAjax);
+    }
+});
+</script>
+
+<!-- Crop Modal -->
+<div class="modal fade crop-modal" id="cropModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Crop Image</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3 text-center aspect-ratio-btns">
+                    <label class="form-label d-block mb-2">Aspect Ratio:</label>
+                    <button type="button" class="btn btn-sm btn-outline-primary" onclick="setAspectRatio(1)">1:1</button>
+                    <button type="button" class="btn btn-sm btn-outline-primary" onclick="setAspectRatio(16/9)">16:9</button>
+                    <button type="button" class="btn btn-sm btn-outline-primary active" onclick="setAspectRatio(NaN)">Free</button>
+                </div>
+                <div class="crop-container">
+                    <img id="crop-image" src="" alt="Crop">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="applyCrop()">Apply Crop</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
+<script>
+let cropper = null;
+let currentGalleryId = null;
+
+function openCropModal(event, type, galleryId = null) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    currentGalleryId = galleryId;
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const image = document.getElementById('crop-image');
+        image.src = e.target.result;
+        
+        if (cropper) {
+            cropper.destroy();
+        }
+        
+        const modal = new bootstrap.Modal(document.getElementById('cropModal'));
+        modal.show();
+        
+        document.getElementById('cropModal').addEventListener('shown.bs.modal', function() {
+            cropper = new Cropper(image, {
+                aspectRatio: NaN,
+                viewMode: 1,
+                autoCropArea: 1,
+                responsive: true,
+                background: false
+            });
+        }, { once: true });
+    };
+    reader.readAsDataURL(file);
+}
+
+function setAspectRatio(ratio) {
+    if (cropper) {
+        cropper.setAspectRatio(ratio);
+    }
+    document.querySelectorAll('.aspect-ratio-btns .btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    event.target.classList.add('active');
+}
+
+function applyCrop() {
+    if (!cropper) return;
+    
+    const canvas = cropper.getCroppedCanvas({
+        maxWidth: 1920,
+        maxHeight: 1920,
+        imageSmoothingEnabled: true,
+        imageSmoothingQuality: 'high'
+    });
+    
+    const base64Data = canvas.toDataURL('image/jpeg', 0.9);
+    
+    document.getElementById(`gallery-data-${currentGalleryId}`).value = base64Data;
+    
+    const preview = document.getElementById(`gallery-preview-${currentGalleryId}`);
+    const img = document.getElementById(`gallery-img-${currentGalleryId}`);
+    if (preview && img) {
+        img.src = base64Data;
+        preview.style.display = 'flex';
+    }
+    
+    bootstrap.Modal.getInstance(document.getElementById('cropModal')).hide();
+    cropper.destroy();
+    cropper = null;
+}
+
+document.getElementById('cropModal').addEventListener('hidden.bs.modal', function() {
+    if (cropper) {
+        cropper.destroy();
+        cropper = null;
     }
 });
 </script>

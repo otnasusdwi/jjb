@@ -20,14 +20,8 @@ Route::get('/package/{slug}', [LandingController::class, 'showPackage'])->name('
 
 // Redirect dashboard based on role
 Route::get('/dashboard', function () {
-    $user = auth()->user();
-
-    return match($user->role) {
-        'super_admin', 'admin' => redirect()->route('admin.dashboard'),
-        'affiliate' => redirect()->route('affiliate.dashboard'),
-        default => redirect()->route('home'),
-    };
-})->middleware(['auth', 'verified'])->name('dashboard');
+    return redirect()->route('admin.dashboard');
+})->name('dashboard');
 
 // Affiliate Registration Routes
 Route::prefix('register/affiliate')->group(function () {
@@ -37,7 +31,7 @@ Route::prefix('register/affiliate')->group(function () {
 });
 
 // Admin Routes
-Route::prefix('admin')->middleware(['auth', 'role:admin,super_admin'])->name('admin.')->group(function () {
+Route::prefix('admin')->name('admin.')->group(function () {
     // Dashboard
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
 
