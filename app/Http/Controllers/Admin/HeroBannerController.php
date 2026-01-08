@@ -146,7 +146,7 @@ class HeroBannerController extends Controller
     /**
      * Save base64 image string to storage with compression (16:9 aspect ratio).
      */
-    private function saveBase64Image(string $data, string $directory, int $quality = 70): string
+    private function saveBase64Image(string $data, string $directory, int $quality = 90): string
     {
         if (str_contains($data, ',')) {
             $data = explode(',', $data, 2)[1];

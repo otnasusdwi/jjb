@@ -442,7 +442,7 @@ class TravelPackageController extends Controller
     /**
      * Save base64 image string to storage with compression.
      */
-    private function saveBase64Image(string $data, string $directory, int $quality = 80): string
+    private function saveBase64Image(string $data, string $directory, int $quality = 90): string
     {
         if (str_contains($data, ',')) {
             $data = explode(',', $data, 2)[1];

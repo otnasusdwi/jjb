@@ -225,8 +225,8 @@ function applyCrop() {
         imageSmoothingQuality: 'high'
     });
     
-    // Reduce quality to 0.65 to keep base64 size manageable
-    const base64Data = canvas.toDataURL('image/jpeg', 0.65);
+    // High quality for HD images
+    const base64Data = canvas.toDataURL('image/jpeg', 0.9);
     document.getElementById('image_data').value = base64Data;
     
     const preview = document.getElementById('image-preview');
