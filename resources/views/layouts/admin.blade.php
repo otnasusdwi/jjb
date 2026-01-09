@@ -140,6 +140,27 @@
                             Hero Banners
                         </a>
                     </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle {{ request()->routeIs('admin.about.*') ? 'active' : '' }}"
+                           href="#" id="aboutDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="ri-information-line me-2"></i>
+                            About Us
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="aboutDropdown">
+                            <li>
+                                <a class="dropdown-item {{ request()->routeIs('admin.about.index') ? 'active' : '' }}"
+                                   href="{{ route('admin.about.index') }}">
+                                    <i class="ri-file-text-line me-2"></i>Page Content
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item {{ request()->routeIs('admin.about.team.*') ? 'active' : '' }}"
+                                   href="{{ route('admin.about.team.index') }}">
+                                    <i class="ri-team-line me-2"></i>Team Members
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
                     {{-- <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('admin.bookings.*') ? 'active' : '' }}"
                            href="{{ route('admin.bookings.index') }}">

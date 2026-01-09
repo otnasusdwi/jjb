@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\TravelPackage;
 use App\Models\PackageCategory;
 use App\Models\HeroBanner;
+use App\Models\AboutPage;
+use App\Models\TeamMember;
 use Illuminate\Http\Request;
 
 class LandingController extends Controller
@@ -42,5 +44,13 @@ class LandingController extends Controller
             ->firstOrFail();
 
         return view('landing.package', compact('package'));
+    }
+
+    public function about()
+    {
+        $aboutPage = AboutPage::first();
+        $teamMembers = TeamMember::where('is_active', true)->orderBy('order')->get();
+
+        return view('landing.about', compact('aboutPage', 'teamMembers'));
     }
 }

@@ -9,7 +9,7 @@ use App\Http\Controllers\Admin\HeroBannerController;
 use App\Http\Controllers\Admin\BookingController as AdminBookingController;
 use App\Http\Controllers\Admin\PaymentController as AdminPaymentController;
 use App\Http\Controllers\Admin\ReportController;
-use App\Http\Controllers\Admin\SettingsController;
+use App\Http\Controllers\Admin\AboutController;
 use App\Http\Controllers\Admin\AffiliateController as AdminAffiliateController;
 use App\Http\Controllers\Affiliate\DashboardController as AffiliateDashboardController;
 use App\Http\Controllers\AffiliateRegistrationController;
@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Route;
 // Public routes
 Route::get('/', [LandingController::class, 'index'])->name('home');
 Route::get('/package/{slug}', [LandingController::class, 'showPackage'])->name('package.show');
+Route::get('/about', [LandingController::class, 'about'])->name('about');
 
 // Redirect dashboard based on role
 Route::get('/dashboard', function () {
@@ -165,6 +166,24 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->name('admin.')->grou
         Route::get('/backup/{filename}/download', [SettingsController::class, 'downloadBackup'])->name('backup.download');
         Route::delete('/backup/{filename}', [SettingsController::class, 'deleteBackup'])->name('backup.delete');
         Route::get('/system', [SettingsController::class, 'system'])->name('system');
+    });
+
+    // About Us Management
+    Route::prefix('about')->name('about.')->group(function () {
+        Route::get('/', [AboutController::class, 'index'])->name('index');
+        Route::put('/', [AboutController::class, 'update'])->name('update');
+        
+        // Team Members
+        Route::prefix('team')->name('team.')->group(function () {
+            Route::get('/', [AboutController::class, 'teamIndex'])->name('index');
+            Route::get('/create', [AboutController::class, 'teamCreate'])->name('create');
+            Route::post('/', [AboutController::class, 'teamStore'])->name('store');
+            Route::get('/{teamMember}/edit', [AboutController::class, 'teamEdit'])->name('edit');
+            Route::put('/{teamMember}', [AboutController::class, 'teamUpdate'])->name('update');
+            Route::delete('/{teamMember}', [AboutController::class, 'teamDestroy'])->name('destroy');
+            Route::post('/{teamMember}/toggle-status', [AboutController::class, 'teamToggleStatus'])->name('toggle-status');
+            Route::post('/reorder', [AboutController::class, 'teamReorder'])->name('reorder');
+        });
     });
 });
 

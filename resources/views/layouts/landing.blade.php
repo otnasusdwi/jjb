@@ -310,6 +310,9 @@
                         <a class="nav-link" href="{{ route('home') }}#packages">Packages</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" href="{{ route('about') }}">About Us</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="{{ route('home') }}#contact">Contact</a>
                     </li>
                 </ul>
