@@ -68,45 +68,22 @@
                             </div>
                         </div>
                         @endif
-                        <div class="experience-card-content">
-                            <h3>{{ strtoupper($tag->name) }}</h3>
-                            <p>{{ $tag->description ?? ucfirst($tag->name) . ' Island packages' }}</p>
-                            <button class="btn">Explore Packages</button>
-                        </div>
-                    </div>
-                </div>
-                @endforeach
-                
-                <div class="col-md-4">
-                    <div class="experience-card" onclick="window.location.href='#contact'">
-                        <div class="experience-card-gallery">
-                            <div id="carouselCustom" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
-                                <div class="carousel-inner">
-                                    <div class="carousel-item active">
-                                        <img src="{{ asset('images/custom/custom-1.jpg') }}" alt="Custom Tour">
-                                    </div>
-                                    <div class="carousel-item">
-                                        <img src="{{ asset('images/custom/custom-2.jpg') }}" alt="Custom Tour">
-                                    </div>
-                                    <div class="carousel-item">
-                                        <img src="{{ asset('images/custom/custom-3.jpg') }}" alt="Custom Tour">
-                                    </div>
-                                </div>
-                                <button class="carousel-control-prev" type="button" data-bs-target="#carouselCustom" data-bs-slide="prev" style="width: 5%; background: rgba(0,0,0,0.3);">
-                                    <span class="carousel-control-prev-icon"></span>
-                                </button>
-                                <button class="carousel-control-next" type="button" data-bs-target="#carouselCustom" data-bs-slide="next" style="width: 5%; background: rgba(0,0,0,0.3);">
-                                    <span class="carousel-control-next-icon"></span>
-                                </button>
-                            </div>
-                        </div>
+                        @if (strtoupper($tag->name) == 'CUSTOM')
                         <div class="experience-card-content">
                             <h3>CUSTOM</h3>
                             <p>Tailored Experiences</p>
                             <button class="btn">Contact Us</button>
                         </div>
+                        @else
+                        <div class="experience-card-content">
+                            <h3>{{ strtoupper($tag->name) }}</h3>
+                            <p>{{ $tag->description ?? ucfirst($tag->name) . ' Island packages' }}</p>
+                            <button class="btn">Explore Packages</button>
+                        </div>
+                        @endif
                     </div>
                 </div>
+                @endforeach
             </div>
         </div>
     </section>
