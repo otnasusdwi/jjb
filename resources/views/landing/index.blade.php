@@ -49,7 +49,7 @@
                     <div class="experience-card" data-tag-id="{{ $tag->id }}" data-tag-slug="{{ $tag->slug }}" onclick="filterByTag(event, {{ $tag->id }}, '{{ $tag->name }}')">
                         @if($tag->galleries && $tag->galleries->count() > 0)
                         <div class="experience-card-gallery">
-                            <div id="carousel{{ $tag->id }}" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
+                            <div id="carousel{{ $tag->id }}" class="carousel slide" data-bs-ride="carousel" data-bs-interval="{{ rand(3000, 8000) }}">
                                 <div class="carousel-inner">
                                     @foreach($tag->galleries as $index => $gallery)
                                     <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
