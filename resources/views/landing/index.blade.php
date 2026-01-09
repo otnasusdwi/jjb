@@ -83,13 +83,13 @@
                             <div id="carouselCustom" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
                                 <div class="carousel-inner">
                                     <div class="carousel-item active">
-                                        <img src="https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=600&h=300&fit=crop" alt="Custom Tour">
+                                        <img src="{{ asset('images/custom/custom-1.jpg') }}" alt="Custom Tour">
                                     </div>
                                     <div class="carousel-item">
-                                        <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=300&fit=crop" alt="Custom Tour">
+                                        <img src="{{ asset('images/custom/custom-2.jpg') }}" alt="Custom Tour">
                                     </div>
                                     <div class="carousel-item">
-                                        <img src="https://images.unsplash.com/photo-1522383507921-f0d4797e56b2?w=600&h=300&fit=crop" alt="Custom Tour">
+                                        <img src="{{ asset('images/custom/custom-3.jpg') }}" alt="Custom Tour">
                                     </div>
                                 </div>
                                 <button class="carousel-control-prev" type="button" data-bs-target="#carouselCustom" data-bs-slide="prev" style="width: 5%; background: rgba(0,0,0,0.3);">
