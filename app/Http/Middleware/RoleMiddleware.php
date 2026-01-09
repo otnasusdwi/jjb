@@ -28,8 +28,22 @@ class RoleMiddleware
         }
 
         // Check if user has required role
-        if (!empty($roles) && !in_array($user->role, $roles)) {
-            abort(403, 'Unauthorized access.');
+        if (!empty($roles)) {
+            $hasRole = false;
+            foreach ($roles as $role) {
+                if ($role === 'admin') {
+                    // For admin role, check if user is either admin or super_admin
+                    $hasRole = in_array($user->role, ['admin', 'super_admin']);
+                } else {
+                    // For other roles, check exact match
+                    $hasRole = $user->role === $role;
+                }
+                if ($hasRole) break;
+            }
+            
+            if (!$hasRole) {
+                abort(403, 'Unauthorized access.');
+            }
         }
 
         return $next($request);
