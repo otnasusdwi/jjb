@@ -189,7 +189,7 @@
                         @endif
                         @if($package->exclusions)
                         <div class="col-md-6">
-                            <h6 class="text-danger"><i class="ri-close-line me-2"></i>What's Not Included</h6>
+                            <h6 class="text-danger"><i class="ri-close-line me-2"></i>What's Excluded</h6>
                             <div class="text-break">
                                 {!! nl2br(e($package->exclusions)) !!}
                             </div>

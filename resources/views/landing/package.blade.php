@@ -200,7 +200,7 @@
 
                                 @if($package->exclusions && $package->exclusions->count() > 0)
                                 <div class="info-row">
-                                    <div class="info-label">Not Included</div>
+                                    <div class="info-label">Excluded</div>
                                     <div class="info-value">
                                         @foreach($package->exclusions as $exclusion)
                                         <div style="display: flex; gap: 0.75rem; margin-bottom: 0.75rem; align-items: flex-start;">

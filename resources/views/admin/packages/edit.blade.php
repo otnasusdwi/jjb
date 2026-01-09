@@ -352,7 +352,7 @@
                         <div class="col-lg-6">
                             <div class="card">
                                 <div class="card-header d-flex justify-content-between align-items-center">
-                                    <h5 class="card-title mb-0">What's Not Included</h5>
+                                    <h5 class="card-title mb-0">What's Excluded</h5>
                                     <button type="button" class="btn btn-sm btn-danger" onclick="addExclusion()">
                                         <i class="ri-add-line"></i> Add
                                     </button>

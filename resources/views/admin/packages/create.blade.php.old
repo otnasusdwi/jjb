@@ -223,7 +223,7 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="exclusions" class="form-label">What's Not Included</label>
+                                    <label for="exclusions" class="form-label">What's Excluded</label>
                                     <textarea class="form-control @error('exclusions') is-invalid @enderror"
                                               id="exclusions" name="exclusions" rows="6"
                                               placeholder="Enter each exclusion on a new line">{{ old('exclusions') }}</textarea>
