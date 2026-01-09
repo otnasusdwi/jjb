@@ -13,32 +13,25 @@ class RoleMiddleware
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    // public function handle(Request $request, Closure $next, ...$roles): Response
-    // {
-    //     if (!auth()->check()) {
-    //         return redirect()->route('login');
-    //     }
-
-    //     $user = auth()->user();
-
-    //     // Check if user status is active
-    //     if ($user->status !== 'active') {
-    //         auth()->logout();
-    //         return redirect()->route('login')->with('error', 'Your account is not active. Please contact administrator.');
-    //     }
-
-    //     // Check if user has required role
-    //     if (!empty($roles) && !in_array($user->role, $roles)) {
-    //         abort(403, 'Unauthorized access.');
-    //     }
-
-    //     return $next($request);
-    // }
-
     public function handle(Request $request, Closure $next, ...$roles): Response
     {
-        // Allow access without authentication
+        if (!auth()->check()) {
+            return redirect()->route('login');
+        }
+
+        $user = auth()->user();
+
+        // Check if user status is active
+        if ($user->status !== 'active') {
+            auth()->logout();
+            return redirect()->route('login')->with('error', 'Your account is not active. Please contact administrator.');
+        }
+
+        // Check if user has required role
+        if (!empty($roles) && !in_array($user->role, $roles)) {
+            abort(403, 'Unauthorized access.');
+        }
+
         return $next($request);
     }
-
 }

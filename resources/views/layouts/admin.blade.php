@@ -196,10 +196,10 @@
                             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                                 <span class="avatar-sm me-2">
                                     <span class="avatar-title bg-primary text-white rounded-circle">
-                                        {{ substr(auth()->user()->name, 0, 1) }}
+                                        {{ auth()->check() ? substr(auth()->user()->name, 0, 1) : 'G' }}
                                     </span>
                                 </span>
-                                {{ auth()->user()->name }}
+                                {{ auth()->check() ? auth()->user()->name : 'Guest' }}
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <li><a class="dropdown-item" href="{{ route('profile.edit') }}">Profile</a></li>
