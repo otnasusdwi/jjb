@@ -61,13 +61,13 @@
                 <li class="nav-item" role="presentation">
                     <button class="nav-link active" id="basic-tab" data-bs-toggle="tab" data-bs-target="#basic"
                         type="button" role="tab">
-                        <i class="ri-information-line me-1"></i> Basic Info & Pricing
+                        <i class="ri-file-list-3-line me-1"></i> Basic Info & Pricing
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" id="images-tab" data-bs-toggle="tab" data-bs-target="#images" type="button"
                         role="tab">
-                        <i class="ri-image-line me-1"></i> Images
+                        <i class="ri-gallery-line me-1"></i> Images
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
@@ -283,7 +283,7 @@
                                             <img id="image-preview" src="#" alt="Preview"
                                                 style="max-width: 100%; max-height: 250px; display: none;">
                                             <div id="image-placeholder" class="text-muted">
-                                                <i class="ri-image-line" style="font-size: 48px;"></i>
+                                                <i class="ri-upload-2-line" style="font-size: 48px;"></i>
                                                 <p class="mt-2">Upload featured image</p>
                                             </div>
                                         @endif
@@ -566,7 +566,7 @@ function addGalleryImage() {
             <div class="image-preview mb-2" style="min-height: 150px; border: 2px dashed #ddd; display: flex; align-items: center; justify-content: center;">
                 <img id="gallery-preview-${galleryCounter}" src="#" alt="Preview" style="max-width: 100%; max-height: 150px; display: none;">
                 <div id="gallery-placeholder-${galleryCounter}" class="text-muted text-center">
-                    <i class="ri-image-line" style="font-size: 32px;"></i>
+                    <i class="ri-upload-2-line" style="font-size: 32px;"></i>
                     <p class="mt-1 mb-0" style="font-size: 0.875rem;">Upload image</p>
                 </div>
             </div>

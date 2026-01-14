@@ -60,6 +60,26 @@
             .sidebar { position: fixed; z-index: 1000; transform: translateX(-100%); }
             .sidebar.show { transform: translateX(0); }
         }
+
+        /* Dropdown Menu Styles */
+        .dropdown-menu {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+        }
+
+        .dropdown-item {
+            color: #333;
+        }
+
+        .dropdown-item:hover,
+        .dropdown-item.active {
+            background-color: #e9ecef;
+            color: #333;
+        }
+
+        .dropdown-divider {
+            border-top: 1px solid #dee2e6;
+        }
     </style>
 
     @stack('styles')
@@ -119,38 +139,36 @@
                             </li>
                         </ul>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('admin.packages.*') ? 'active' : '' }}"
-                           href="{{ route('admin.packages.index') }}">
-                            <i class="ri-gift-line me-2"></i>
-                            Packages
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('admin.tags.*') ? 'active' : '' }}"
-                           href="{{ route('admin.tags.index') }}">
-                            <i class="ri-price-tag-3-line me-2"></i>
-                            Tags
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('admin.hero-banners.*') ? 'active' : '' }}"
-                           href="{{ route('admin.hero-banners.index') }}">
-                            <i class="ri-image-add-line me-2"></i>
-                            Hero Banners
-                        </a>
-                    </li>
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle {{ request()->routeIs('admin.about.*') ? 'active' : '' }}"
-                           href="#" id="aboutDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="ri-information-line me-2"></i>
-                            About Us
+                        <a class="nav-link dropdown-toggle {{ request()->routeIs('admin.packages.*', 'admin.tags.*', 'admin.hero-banners.*', 'admin.about.*') ? 'active' : '' }}"
+                           href="#" id="landingPageDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="ri-global-line me-2"></i>
+                            Landing Page
                         </a>
-                        <ul class="dropdown-menu" aria-labelledby="aboutDropdown">
+                        <ul class="dropdown-menu" aria-labelledby="landingPageDropdown">
+                            <li>
+                                <a class="dropdown-item {{ request()->routeIs('admin.packages.*') ? 'active' : '' }}"
+                                   href="{{ route('admin.packages.index') }}">
+                                    <i class="ri-gift-line me-2"></i>Packages
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item {{ request()->routeIs('admin.tags.*') ? 'active' : '' }}"
+                                   href="{{ route('admin.tags.index') }}">
+                                    <i class="ri-price-tag-3-line me-2"></i>Tags
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item {{ request()->routeIs('admin.hero-banners.*') ? 'active' : '' }}"
+                                   href="{{ route('admin.hero-banners.index') }}">
+                                    <i class="ri-slideshow-line me-2"></i>Hero Banners
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
                             <li>
                                 <a class="dropdown-item {{ request()->routeIs('admin.about.index') ? 'active' : '' }}"
                                    href="{{ route('admin.about.index') }}">
-                                    <i class="ri-file-text-line me-2"></i>Page Content
+                                    <i class="ri-file-text-line me-2"></i>About Page Content
                                 </a>
                             </li>
                             <li>
@@ -161,7 +179,7 @@
                             </li>
                         </ul>
                     </li>
-                    {{-- <li class="nav-item">
+                    <!-- <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('admin.bookings.*') ? 'active' : '' }}"
                            href="{{ route('admin.bookings.index') }}">
                             <i class="ri-calendar-line me-2"></i>
@@ -198,7 +216,7 @@
                             <i class="ri-settings-line me-2"></i>
                             Settings
                         </a>
-                    </li> --}}
+                    </li> -->
                 </ul>
             </div>
         </nav>
