@@ -1087,5 +1087,50 @@ document.getElementById('cropModal').addEventListener('hidden.bs.modal', functio
         cropper = null;
     }
 });
+
+// Auto-switch to tab with validation errors
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('packageForm');
+    const invalidFields = form.querySelectorAll('.is-invalid');
+    
+    if (invalidFields.length > 0) {
+        // Map fields to their tabs
+        const fieldToTab = {
+            'name': 'basic-tab',
+            'description': 'basic-tab',
+            'category_id': 'basic-tab',
+            'duration_days': 'basic-tab',
+            'included_nights': 'basic-tab',
+            'destination': 'basic-tab',
+            'currency': 'basic-tab',
+            'base_price': 'basic-tab',
+            'selling_price': 'basic-tab',
+            'featured_image': 'images-tab',
+            'meta_title': 'settings-tab',
+            'meta_description': 'settings-tab',
+            'meta_keywords': 'settings-tab'
+        };
+        
+        // Get the first invalid field
+        const firstInvalidField = invalidFields[0];
+        const fieldName = firstInvalidField.name;
+        const tabId = fieldToTab[fieldName];
+        
+        if (tabId) {
+            // Switch to the appropriate tab
+            const tabButton = document.getElementById(tabId);
+            if (tabButton) {
+                const tab = new bootstrap.Tab(tabButton);
+                tab.show();
+                
+                // Scroll to the field after tab switch
+                setTimeout(() => {
+                    firstInvalidField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    firstInvalidField.focus();
+                }, 100);
+            }
+        }
+    }
+});
 </script>
 @endpush
