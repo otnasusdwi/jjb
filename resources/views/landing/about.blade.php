@@ -133,7 +133,9 @@
             @if($aboutPage->ceo_image)
             <div class="col-lg-4">
                 <div class="ceo-photo">
-                    <img src="{{ asset('storage/' . $aboutPage->ceo_image) }}" alt="{{ $aboutPage->ceo_name ?? 'CEO' }}">
+                    <a href="{{ asset('storage/' . $aboutPage->ceo_image) }}" class="gallery-lightbox" data-glightbox="title:{{ $aboutPage->ceo_name ?? 'CEO' }}">
+                        <img src="{{ asset('storage/' . $aboutPage->ceo_image) }}" alt="{{ $aboutPage->ceo_name ?? 'CEO' }}">
+                    </a>
                 </div>
             </div>
             @endif
@@ -171,7 +173,9 @@
                 <div class="team-card">
                     <div class="avatar">
                         @if($member->image)
-                            <img src="{{ asset('storage/' . $member->image) }}" alt="{{ $member->name }}">
+                            <a href="{{ asset('storage/' . $member->image) }}" class="gallery-lightbox" data-glightbox="title:{{ $member->name }}">
+                                <img src="{{ asset('storage/' . $member->image) }}" alt="{{ $member->name }}">
+                            </a>
                         @else
                             <div class="avatar-placeholder"><i class="bi bi-person"></i></div>
                         @endif
