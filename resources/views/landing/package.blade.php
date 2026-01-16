@@ -279,11 +279,6 @@
                                 @foreach($package->galleries->sortBy('order') as $gallery)
                                 <a href="{{ asset('storage/' . $gallery->image_path) }}" class="gallery-item gallery-lightbox" data-glightbox="title:{{ $gallery->caption ?? $package->name }}">
                                     <img src="{{ asset('storage/' . $gallery->image_path) }}" alt="{{ $gallery->caption ?? $package->name }}">
-                                    @if($gallery->caption)
-                                    <div class="gallery-caption">
-                                        {{ $gallery->caption }}
-                                    </div>
-                                    @endif
                                 </a>
                                 @endforeach
                             </div>
