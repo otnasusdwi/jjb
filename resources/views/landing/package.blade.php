@@ -2,17 +2,17 @@
 
 @section('head')
     <!-- SEO Meta Tags -->
-    <title>{{ $package->seo_title ?? $package->name }} - JJB Travel Services</title>
-    <meta name="description" content="{{ $package->seo_description ?? $package->short_description ?? substr(strip_tags($package->description), 0, 160) }}">
-    <meta name="keywords" content="{{ $package->seo_keywords ?? '' }}">
+    <title>{{ $package->meta_title ?? $package->name }} - JJB Travel Services</title>
+    <meta name="description" content="{{ $package->meta_description ?? $package->short_description ?? substr(strip_tags($package->description), 0, 160) }}">
+    <meta name="keywords" content="{{ $package->keywords ?? '' }}">
     <meta name="author" content="JJB Travel Services">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="{{ route('package.show', $package->slug) }}">
     
     <!-- Open Graph Meta Tags (Social Media) -->
     <meta property="og:type" content="website">
-    <meta property="og:title" content="{{ $package->seo_title ?? $package->name }}">
-    <meta property="og:description" content="{{ $package->seo_description ?? $package->short_description ?? substr(strip_tags($package->description), 0, 160) }}">
+    <meta property="og:title" content="{{ $package->meta_title ?? $package->name }}">
+    <meta property="og:description" content="{{ $package->meta_description ?? $package->short_description ?? substr(strip_tags($package->description), 0, 160) }}">
     <meta property="og:url" content="{{ route('package.show', $package->slug) }}">
     @if($package->featured_image)
     <meta property="og:image" content="{{ asset('storage/' . $package->featured_image) }}">
@@ -21,8 +21,8 @@
     
     <!-- Twitter Card Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="{{ $package->seo_title ?? $package->name }}">
-    <meta name="twitter:description" content="{{ $package->seo_description ?? $package->short_description ?? substr(strip_tags($package->description), 0, 160) }}">
+    <meta name="twitter:title" content="{{ $package->meta_title ?? $package->name }}">
+    <meta name="twitter:description" content="{{ $package->meta_description ?? $package->short_description ?? substr(strip_tags($package->description), 0, 160) }}">
     @if($package->featured_image)
     <meta name="twitter:image" content="{{ asset('storage/' . $package->featured_image) }}">
     @endif
