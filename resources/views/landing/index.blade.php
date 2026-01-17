@@ -27,10 +27,9 @@
             <div class="row align-items-center">
                 <div class="col-lg-7 col-xl-6 mb-4 mb-lg-0">
                     <p class="hero-subtitle">Java Representative</p>
-                    <h1 class="hero-title">Your Asia Dream's Come True: Indonesia</h1>
+                    <h1 class="hero-title">Your Asia Dreams Come True : Indonesia</h1>
                     <p class="hero-description">
-                        Experience with our expert in Java, Bali, Lombok and Labuan Bajo. 
-                        Discover the authentic beauty of Indonesia with personalized tours designed for European travelers.
+                        Experience with our experts in Java, Bali, Lombok and Labuan Bajo. Discover life, nature, culture and authentic Indonesian legacy on a private tour.
                     </p>
                     <a href="#packages" class="btn btn-primary-custom">Browse Packages</a>
                 </div>
