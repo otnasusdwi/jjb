@@ -6,22 +6,22 @@
     <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
     <link rel="apple-touch-icon" href="{{ asset('favicon.png') }}">
     <meta name="theme-color" content="#FF8C00">
-    <title>Indonesia Private Tours | Your Asia Dreams Come True</title>
+    <title>Java Representative, Your Asia Dreams Come True : Indonesia</title>
 
-    <meta name="description" content="Experience Indonesia with our experts in Java, Bali, Lombok, and Labuan Bajo. Discover life, nature, culture, and authentic Indonesian legacy on a private tour.">
+    <meta name="description" content="Experience with our experts in Java, Bali, Lombok and Labuan Bajo. Discover life, nature, culture and authentic Indonesian legacy on a private tour.">
 
     <meta name="keywords" content="Indonesia private tour, Indonesia travel package, Bali private tour, Java tour Indonesia, Lombok tour package, Labuan Bajo tour, Komodo tour, Indonesia luxury travel, custom Indonesia tour, Indonesia holiday package">
 
     <!-- Open Graph for Google Travel / OTA / Social -->
-    <meta property="og:title" content="Indonesia Private Tours | Your Asia Dreams Come True">
-    <meta property="og:description" content="Discover Indonesia with expert-guided private tours in Java, Bali, Lombok, and Labuan Bajo. Experience nature, culture, and authentic local life.">
+    <meta property="og:title" content="Java Representative,Your Asia Dreams Come True : Indonesia">
+    <meta property="og:description" content="Experience with our experts in Java, Bali, Lombok and Labuan Bajo. Discover life, nature, culture and authentic Indonesian legacy on a private tour.">
     <meta property="og:type" content="website">
     <meta property="og:locale" content="en_US">
 
     <!-- Twitter Card (OTA & sharing preview) -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Indonesia Private Tours | Your Asia Dreams Come True">
-    <meta name="twitter:description" content="Private tours across Java, Bali, Lombok, and Labuan Bajo with local experts. Discover authentic Indonesia.">
+    <meta name="twitter:title" content="Java Representative, Your Asia Dreams Come True : Indonesia">
+    <meta name="twitter:description" content="Experience with our experts in Java, Bali, Lombok and Labuan Bajo. Discover life, nature, culture and authentic Indonesian legacy on a private tour.">
 
     <!-- Geo & Travel relevance (optional but helpful) -->
     <meta name="geo.region" content="ID">
