@@ -6,6 +6,27 @@
     <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
     <link rel="apple-touch-icon" href="{{ asset('favicon.png') }}">
     <meta name="theme-color" content="#FF8C00">
+    <title>Indonesia Private Tours | Your Asia Dreams Come True</title>
+
+    <meta name="description" content="Experience Indonesia with our experts in Java, Bali, Lombok, and Labuan Bajo. Discover life, nature, culture, and authentic Indonesian legacy on a private tour.">
+
+    <meta name="keywords" content="Indonesia private tour, Indonesia travel package, Bali private tour, Java tour Indonesia, Lombok tour package, Labuan Bajo tour, Komodo tour, Indonesia luxury travel, custom Indonesia tour, Indonesia holiday package">
+
+    <!-- Open Graph for Google Travel / OTA / Social -->
+    <meta property="og:title" content="Indonesia Private Tours | Your Asia Dreams Come True">
+    <meta property="og:description" content="Discover Indonesia with expert-guided private tours in Java, Bali, Lombok, and Labuan Bajo. Experience nature, culture, and authentic local life.">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="en_US">
+
+    <!-- Twitter Card (OTA & sharing preview) -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Indonesia Private Tours | Your Asia Dreams Come True">
+    <meta name="twitter:description" content="Private tours across Java, Bali, Lombok, and Labuan Bajo with local experts. Discover authentic Indonesia.">
+
+    <!-- Geo & Travel relevance (optional but helpful) -->
+    <meta name="geo.region" content="ID">
+    <meta name="geo.placename" content="Indonesia">
+
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     
