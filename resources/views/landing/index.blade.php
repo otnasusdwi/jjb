@@ -207,7 +207,7 @@
     </section>
 
     <!-- Video Section -->
-    <section>
+    <!-- <section>
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-lg-8">
@@ -217,7 +217,7 @@
                 </div>
             </div>
         </div>
-    </section>
+    </section> -->
 
     <!-- Contact Section -->
     <section class="contact-section" id="contact">
